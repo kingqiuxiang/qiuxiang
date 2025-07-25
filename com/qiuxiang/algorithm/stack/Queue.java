@@ -1,29 +1,29 @@
 package com.qiuxiang.algorithm.stack;
 
-public class Stack {
-    private int[] stack;
+public class Queue {
+    private int[] queue;
     private int popIndex = 0;
     private int size = 0;
     private int index = 0;
     private int limit = DEFAULT_CAPACITY;
     private static final int DEFAULT_CAPACITY = 10;
 
-    public Stack() {
-        stack = new int[DEFAULT_CAPACITY];
+    public Queue() {
+        queue = new int[DEFAULT_CAPACITY];
     }
 
-    public Stack(int limit) {
+    public Queue(int limit) {
         this.limit = limit;
-        stack = new int[limit];
+        queue = new int[limit];
     }
 
-    public int push(int value) {
+    public void push(int value) {
         if (size >= limit) {
-            throw new StackOverflowError();
+            throw new RuntimeException("Queue is full");
         }
+        queue[index] = value;
         index = calculateIndex(index);
         size++;
-        return stack[index] = value;
     }
 
     private int calculateIndex(int index) {
@@ -37,9 +37,9 @@ public class Stack {
 
     public int pop() {
         if (size == 0) {
-            throw new IllegalStateException("Stack is empty");
+            throw new RuntimeException("queue is empty");
         }
-        int value = stack[popIndex];
+        int value = queue[popIndex];
         size--;
         popIndex = calculateIndex(popIndex);
         return value;

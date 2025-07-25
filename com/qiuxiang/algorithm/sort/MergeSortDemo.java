@@ -1,15 +1,15 @@
 package com.qiuxiang.algorithm.sort;
 
-public class QuicklySortDemo {
+public class MergeSortDemo {
 
 
-    public static void quicklySort(int[] arr, int left, int right) {
+    public static void mergeSort(int[] arr, int left, int right) {
 
         if (left >= right) {
             return;
         }
-        quicklySort(arr, left, (right + left) / 2);
-        quicklySort(arr, 1 + (left + right) / 2, right);
+        mergeSort(arr, left, (right + left) / 2);
+        mergeSort(arr, 1 + (left + right) / 2, right);
         merger(arr, left, (right + left) / 2, right);
 
 

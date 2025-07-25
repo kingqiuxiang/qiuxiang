@@ -1,4 +1,4 @@
-package com.citi;
+package com.qiuxiang.algorithm;
 
-public class algorithm {
+public class ListDemo {
 }
