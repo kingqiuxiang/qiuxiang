@@ -57,7 +57,7 @@ public class QuicklySortDemo {
     }
 
 
-    private static int partition(int[] arr, int L, int R) {
+    public static int partition(int[] arr, int L, int R) {
         int pivot = arr[R];
 
         int low = L; // low pointer for values less than pivot
@@ -109,7 +109,7 @@ public class QuicklySortDemo {
         }
         return new int[]{low, high};
     }
-    private static void swap(int[] arr, int i, int j) {
+    public static void swap(int[] arr, int i, int j) {
         int temp = arr[i];
         arr[i] = arr[j];
         arr[j] = temp;

@@ -1,9 +1,9 @@
 package com.qiuxiang.algorithm.nodes;
 
 public class Node {
-    private int value;
+     int value;
 
-    private Node nextNode;
+     Node nextNode;
 
     public int getValue() {
         return value;
@@ -25,6 +25,11 @@ public class Node {
         this.value = value;
         this.nextNode = nextNode;
     }
+
+    public Node(int value) {
+        this.value = value;
+    }
+
 
     /**
      * Reverse the linked list starting from this node.
