@@ -2,6 +2,7 @@ package com.qiuxiang.algorithm.tree.twoProngedTree.test;
 
 import com.qiuxiang.algorithm.tree.twoProngedTree.TwoProngedTree;
 
+import java.security.PublicKey;
 import java.util.List;
 
 public class TwoProngedTreeTest {
@@ -112,9 +113,9 @@ public class TwoProngedTreeTest {
     /**
      * 给定二叉树头节点, head,判断该树是不是平衡二叉树
      */
-public boolean isBalance(TwoProngedTree head) {
-    return process(head).isBalance;
-}
+    public boolean isBalance(TwoProngedTree head) {
+        return process(head).isBalance;
+    }
 
     public static class Info {
         public boolean isBalance;
@@ -148,6 +149,7 @@ public boolean isBalance(TwoProngedTree head) {
 
     /**
      * 我来个手写版本的,方式有点像后序遍历,但其实并不是,它是一个递归序
+     *
      * @param x
      * @return
      */
@@ -180,15 +182,15 @@ public boolean isBalance(TwoProngedTree head) {
     }
 
     private InfoDis doMaxDistance(TwoProngedTree head) {
-       if (head == null) {
-           return new InfoDis(0,0);
-       }
+        if (head == null) {
+            return new InfoDis(0, 0);
+        }
         InfoDis left = doMaxDistance(head.left);
         InfoDis right = doMaxDistance(head.right);
 
         int height = Math.max(left.height, right.height) + 1;
         int maxDistance = Math.max(Math.max(left.maxDistance, right.maxDistance), left.height + right.height + 1);
-        return new InfoDis(maxDistance,height);
+        return new InfoDis(maxDistance, height);
 
 
     }
@@ -218,30 +220,30 @@ public boolean isBalance(TwoProngedTree head) {
         if (head == null) {
             return null;
         }
-        MaxSearchInfo left =  process3(head.left);
+        MaxSearchInfo left = process3(head.left);
         MaxSearchInfo right = process3(head.right);
-       int min = head.root;
-       int max = head.root;
-       int subSize = 0;
-       boolean balance = false;
-       if (left != null) {
-           min = Math.min(min, left.minValue);
-           max = Math.max(max, left.maxValue);
-           subSize = Math.max(subSize, left.subSize);
-       }
-       if (right != null) {
-           min = Math.min(min, right.minValue);
-           max = Math.max(max, right.maxValue);
-           subSize = Math.max(subSize, right.subSize);
-       }
+        int min = head.root;
+        int max = head.root;
+        int subSize = 0;
+        boolean balance = false;
+        if (left != null) {
+            min = Math.min(min, left.minValue);
+            max = Math.max(max, left.maxValue);
+            subSize = Math.max(subSize, left.subSize);
+        }
+        if (right != null) {
+            min = Math.min(min, right.minValue);
+            max = Math.max(max, right.maxValue);
+            subSize = Math.max(subSize, right.subSize);
+        }
 
 
-         if ((left == null || (left.isSearchTree && left.maxValue < head.root))
+        if ((left == null || (left.isSearchTree && left.maxValue < head.root))
                 && (right == null || (right.isSearchTree && right.minValue > head.root))) {
-              balance = true;
-              subSize = (left == null ? 0 : left.subSize) + (right == null ? 0 : right.subSize) + 1;
-         }
-         return new MaxSearchInfo(balance, subSize, min, max);
+            balance = true;
+            subSize = (left == null ? 0 : left.subSize) + (right == null ? 0 : right.subSize) + 1;
+        }
+        return new MaxSearchInfo(balance, subSize, min, max);
     }
 
     public static class MaxSearchInfo {
@@ -255,7 +257,7 @@ public boolean isBalance(TwoProngedTree head) {
             this.subSize = subSize;
         }
 
-        public MaxSearchInfo(boolean isSearchTree, int  subSize, int minValue, int maxValue) {
+        public MaxSearchInfo(boolean isSearchTree, int subSize, int minValue, int maxValue) {
             this.isSearchTree = isSearchTree;
             this.subSize = subSize;
             this.minValue = minValue;
@@ -265,7 +267,7 @@ public boolean isBalance(TwoProngedTree head) {
 
     public static class NodeTT<V> {
         V value;
-       public List<NodeTT<V>> children;
+        public List<NodeTT<V>> children;
 
         public NodeTT(V value, List<NodeTT<V>> children) {
             this.value = value;
@@ -275,6 +277,7 @@ public boolean isBalance(TwoProngedTree head) {
         public NodeTT() {
         }
     }
+
     /**
      * 员工最大快乐值问题
      */
@@ -286,12 +289,11 @@ public boolean isBalance(TwoProngedTree head) {
         return Math.max(allInfo.yes, allInfo.no);
 
 
-
     }
 
     private InfoHappy processHappy(NodeTT<Integer> head) {
         if (head.children.isEmpty()) {
-            return new InfoHappy(1,0);
+            return new InfoHappy(1, 0);
         }
         int yes = head.value;
         int no = 0;
@@ -318,6 +320,90 @@ public boolean isBalance(TwoProngedTree head) {
         }
     }
 
+    public static class InfoFullExactly {
+        private boolean full;
+        private boolean exact;
+        private int height;
+
+        public InfoFullExactly(boolean full, boolean exact, int height) {
+            this.full = full;
+            this.exact = exact;
+            this.height = height;
+        }
+    }
+
+    /**
+     * 判断二叉树是不是平衡二叉树
+     */
+
+    public boolean isFullExactly(TwoProngedTree head) {
+        if (head == null) {
+            return true;
+        }
+        return processFull(head).exact;
+
+
+    }
+
+    private InfoFullExactly processFull(TwoProngedTree head) {
+        if (head == null) {
+            return new InfoFullExactly(true, true, 0);
+        }
+        InfoFullExactly left = processFull(head.left);
+        InfoFullExactly right = processFull(head.right);
+        int height = Math.max(left.height, right.height) + 1;
+        boolean full = left.full && right.full && (left.height == right.height);
+        boolean exact = false;
+        if (left.exact && right.exact) {
+            if (!right.full && left.height == right.height) {
+                exact = true;
+            }
+            if (!left.full && right.full && left.height - right.height == 1) {
+                exact = true;
+            }
+        }
+        return new InfoFullExactly(full, exact, height);
+    }
+
+    /**
+     * 给定一个二叉树的头节点head,和另外两个节点a和b,返回a和b的最低公共祖先节点
+     */
+    public static class InfoLowestAncestor {
+        public boolean findA;
+        public boolean findB;
+        public TwoProngedTree lowestAncestor;
+
+        public InfoLowestAncestor(boolean findA, boolean findB, TwoProngedTree lowestAncestor) {
+            this.findA = findA;
+            this.findB = findB;
+            this.lowestAncestor = lowestAncestor;
+        }
+    }
+
+    public TwoProngedTree lowestAncestor(TwoProngedTree head, TwoProngedTree a, TwoProngedTree b) {
+        if (head == null || a == null || b == null) {
+            return null;
+        }
+        return processLowestAncestor(head, a, b).lowestAncestor;
+    }
+
+    private InfoLowestAncestor processLowestAncestor(TwoProngedTree head, TwoProngedTree a, TwoProngedTree b) {
+        if (head == null) {
+            return new InfoLowestAncestor(false, false, head);
+        }
+        InfoLowestAncestor left = processLowestAncestor(head.left, a, b);
+        InfoLowestAncestor right = processLowestAncestor(head.right, a, b);
+        boolean findA = left.findA || right.findA || a == head;
+        boolean findB = left.findB || right.findB || b == head;
+        if (left.findA && left.findB) {
+            return left;
+        }
+        if (right.findA && right.findB) {
+            return right;
+        }
+        return new InfoLowestAncestor(findA, findB, head);
+
+    }
 
 
 }
