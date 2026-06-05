@@ -1,0 +1,52 @@
+<idea-plugin>
+    <id>com.lingce.ai-file-cleaner</id>
+    <name>AI File Cleaner</name>
+    <vendor email="support@lingce.local">LingCe</vendor>
+
+    <description><![CDATA[
+        Keeps local projects clean by detecting temporary files, likely AI-generated throwaway files,
+        AI tool configuration, and project configuration files. Supports OpenAI-compatible API
+        configuration, automatic cleanup, ignore/exclude handling, quarantine, and one-click deletion.
+    ]]></description>
+
+    <depends>com.intellij.modules.platform</depends>
+
+    <extensions defaultExtensionNs="com.intellij">
+        <applicationConfigurable
+            instance="com.lingce.cleaner.settings.AiFileCleanerConfigurable"
+            displayName="AI File Cleaner"/>
+        <notificationGroup
+            id="AI File Cleaner"
+            displayType="BALLOON"/>
+        <projectService
+            serviceImplementation="com.lingce.cleaner.core.AiFileCleanerProjectService"/>
+        <postStartupActivity
+            implementation="com.lingce.cleaner.core.AiFileCleanerStartupActivity"/>
+    </extensions>
+
+    <actions>
+        <action
+            id="AiFileCleaner.ScanProject"
+            class="com.lingce.cleaner.actions.ScanProjectAction"
+            text="Scan Project for AI/Temp Files"
+            description="Scan the current project for AI-generated, temporary, and configuration files">
+            <add-to-group group-id="ToolsMenu" anchor="last"/>
+        </action>
+
+        <action
+            id="AiFileCleaner.QuarantineSelected"
+            class="com.lingce.cleaner.actions.QuarantineSelectedFilesAction"
+            text="Quarantine Suspicious File(s)"
+            description="Move selected suspicious files to the configured quarantine directory">
+            <add-to-group group-id="ProjectViewPopupMenu" anchor="last"/>
+        </action>
+
+        <action
+            id="AiFileCleaner.DeleteSelected"
+            class="com.lingce.cleaner.actions.DeleteSelectedFilesAction"
+            text="Delete Suspicious File(s)"
+            description="Delete selected suspicious files after confirmation">
+            <add-to-group group-id="ProjectViewPopupMenu" anchor="last"/>
+        </action>
+    </actions>
+</idea-plugin>

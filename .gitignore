@@ -1,4 +1,5 @@
 node_modules/
+.gradle/
 dist/
 build/
 .env
@@ -11,3 +12,4 @@ web/dist/
 coverage/
 .playwright/
 *.tsbuildinfo
+.ai-file-cleaner/
