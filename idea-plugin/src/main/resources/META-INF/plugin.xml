@@ -1,0 +1,34 @@
+<idea-plugin>
+    <id>com.lingce.aifilecleaner</id>
+    <name>AI File Cleaner</name>
+    <vendor email="support@lingce.local">LingCe</vendor>
+    <description>
+        <![CDATA[
+        自动识别并清理 AI 生成垃圾文件、tmp 文件，支持可疑文件一键转存/删除。
+        ]]>
+    </description>
+
+    <depends>com.intellij.modules.platform</depends>
+
+    <extensions defaultExtensionNs="com.intellij">
+        <applicationConfigurable
+                id="com.lingce.aifilecleaner.settings"
+                displayName="AI File Cleaner"
+                instance="com.lingce.aifilecleaner.settings.CleanerConfigurable"/>
+        <postStartupActivity implementation="com.lingce.aifilecleaner.startup.ProjectOpenScanner"/>
+        <toolWindow
+                id="AI File Cleaner"
+                factoryClass="com.lingce.aifilecleaner.ui.CleanerToolWindowFactory"
+                icon="/icons/cleaner.svg"
+                anchor="right"/>
+    </extensions>
+
+    <actions>
+        <action id="com.lingce.aifilecleaner.RunScanAction"
+                class="com.lingce.aifilecleaner.actions.RunScanAction"
+                text="Run AI File Cleaner Scan"
+                description="Scan and clean AI-generated/tmp/suspicious files">
+            <add-to-group group-id="ToolsMenu" anchor="last"/>
+        </action>
+    </actions>
+</idea-plugin>
