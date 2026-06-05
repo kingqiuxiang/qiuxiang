@@ -1,0 +1,25 @@
+{
+  "name": "ai-yapi-test-platform",
+  "version": "0.1.0",
+  "private": true,
+  "description": "AI 驱动的 YAPI 接口测试平台 —— 读取 YAPI 参数、以项目代码为基准 AI 一键填充参数、并对开发环境进行自动化测试。",
+  "workspaces": [
+    "server",
+    "web"
+  ],
+  "scripts": {
+    "dev": "concurrently -n server,web -c blue,magenta \"npm:dev:server\" \"npm:dev:web\"",
+    "dev:server": "npm --workspace server run dev",
+    "dev:web": "npm --workspace web run dev",
+    "build": "npm --workspace server run build && npm --workspace web run build",
+    "start": "npm --workspace server run start",
+    "test": "npm --workspace server run test",
+    "lint": "npm --workspace server run lint"
+  },
+  "devDependencies": {
+    "concurrently": "^9.1.2"
+  },
+  "engines": {
+    "node": ">=20"
+  }
+}
