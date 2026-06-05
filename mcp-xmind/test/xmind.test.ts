@@ -24,16 +24,16 @@ test("parseOutline converts headings and bullets into a tree", () => {
     {
       title: "Goals",
       children: [
-        { title: "Improve activation", children: [] },
+        { title: "Improve activation" },
         {
           title: "Reduce churn",
-          children: [{ title: "Better onboarding", children: [] }]
+          children: [{ title: "Better onboarding" }]
         }
       ]
     },
     {
       title: "Risks",
-      children: [{ title: "Limited data", children: [] }]
+      children: [{ title: "Limited data" }]
     }
   ]);
 });
