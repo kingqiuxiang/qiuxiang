@@ -1,0 +1,44 @@
+<idea-plugin>
+    <id>com.lingce.aicleaner</id>
+    <name>AI File Cleaner</name>
+    <vendor email="support@example.com" url="https://example.com">LingCe</vendor>
+
+    <description><![CDATA[
+        Keeps local projects clean by detecting temporary files, AI-generated throwaway files,
+        project configuration files, AI assistant configuration files, and suspicious files.
+        It supports OpenAI-compatible classification APIs with custom API key, base URL, and model.
+    ]]></description>
+
+    <depends>com.intellij.modules.platform</depends>
+
+    <extensions defaultExtensionNs="com.intellij">
+        <applicationService serviceImplementation="com.lingce.aicleaner.AiCleanerSettingsState"/>
+        <projectService serviceImplementation="com.lingce.aicleaner.FileCleanerProjectService"/>
+        <applicationConfigurable
+                parentId="tools"
+                id="com.lingce.aicleaner.settings"
+                displayName="AI File Cleaner"
+                instance="com.lingce.aicleaner.AiCleanerSettingsConfigurable"/>
+        <postStartupActivity implementation="com.lingce.aicleaner.AiCleanerStartupActivity"/>
+        <toolWindow id="AI Cleaner"
+                    anchor="right"
+                    factoryClass="com.lingce.aicleaner.CleanerToolWindowFactory"/>
+        <notificationGroup id="AI File Cleaner" displayType="BALLOON"/>
+    </extensions>
+
+    <actions>
+        <action id="com.lingce.aicleaner.ScanCurrentFileAction"
+                class="com.lingce.aicleaner.ScanCurrentFileAction"
+                text="Scan with AI File Cleaner"
+                description="Classify the selected file and offer cleanup actions">
+            <add-to-group group-id="ProjectViewPopupMenu" anchor="last"/>
+            <add-to-group group-id="EditorPopupMenu" anchor="last"/>
+        </action>
+        <action id="com.lingce.aicleaner.ScanProjectAction"
+                class="com.lingce.aicleaner.ScanProjectAction"
+                text="Scan Project with AI File Cleaner"
+                description="Scan project files for temporary, AI-generated, config, and suspicious files">
+            <add-to-group group-id="ToolsMenu" anchor="last"/>
+        </action>
+    </actions>
+</idea-plugin>
