@@ -1,0 +1,66 @@
+<idea-plugin>
+    <id>com.lingce.clean-guard</id>
+    <name>Clean Guard - AI 文件卫士</name>
+    <vendor email="support@lingce.dev" url="https://github.com">LingCe</vendor>
+
+    <description><![CDATA[
+        导入文件后自动识别 AI 生成文件、临时文件与配置文件，保持本地工作区干净。<br/>
+        <ul>
+            <li>支持配置 OpenAI 兼容 API（API Key + Base URL）</li>
+            <li>自动清理无用 AI 生成文件与临时文件</li>
+            <li>自动将 AI/项目配置文件加入 .gitignore 与 IDE Exclude</li>
+            <li>可疑文件支持一键转存隔离区或一键删除</li>
+        </ul>
+    ]]></description>
+
+    <depends>com.intellij.modules.platform</depends>
+
+    <extensions defaultExtensionNs="com.intellij">
+        <applicationConfigurable
+                parentId="tools"
+                instance="com.lingce.cleanguard.settings.CleanGuardConfigurable"
+                id="com.lingce.cleanguard.settings"
+                displayName="Clean Guard"/>
+
+        <applicationService
+                serviceImplementation="com.lingce.cleanguard.settings.CleanGuardSettings"/>
+
+        <postStartupActivity
+                implementation="com.lingce.cleanguard.CleanGuardStartupActivity"/>
+
+        <toolWindow
+                id="Clean Guard"
+                anchor="bottom"
+                factoryClass="com.lingce.cleanguard.ui.CleanGuardToolWindowFactory"
+                icon="/icons/clean-guard.svg"/>
+
+        <notificationGroup
+                id="Clean Guard"
+                displayType="BALLOON"/>
+    </extensions>
+
+    <actions>
+        <group id="CleanGuard.EditorPopup" text="Clean Guard" popup="true">
+            <add-to-group group-id="EditorPopupMenu" anchor="last"/>
+            <action id="CleanGuard.ScanCurrentFile"
+                    class="com.lingce.cleanguard.actions.ScanCurrentFileAction"
+                    text="扫描当前文件"
+                    description="用 Clean Guard 分析当前文件"/>
+            <action id="CleanGuard.QuarantineCurrentFile"
+                    class="com.lingce.cleanguard.actions.QuarantineCurrentFileAction"
+                    text="转存到隔离区"
+                    description="将当前文件移动到隔离目录"/>
+            <action id="CleanGuard.DeleteCurrentFile"
+                    class="com.lingce.cleanguard.actions.DeleteCurrentFileAction"
+                    text="删除当前文件"
+                    description="删除当前文件"/>
+        </group>
+
+        <action id="CleanGuard.ScanProject"
+                class="com.lingce.cleanguard.actions.ScanProjectAction"
+                text="扫描项目"
+                description="扫描整个项目中的可疑文件">
+            <add-to-group group-id="ToolsMenu" anchor="last"/>
+        </action>
+    </actions>
+</idea-plugin>

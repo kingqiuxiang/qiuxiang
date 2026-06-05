@@ -11,3 +11,9 @@ web/dist/
 coverage/
 .playwright/
 *.tsbuildinfo
+
+# Clean Guard plugin
+/.clean-guard/
+idea-clean-guard/build/
+idea-clean-guard/.gradle/
+idea-clean-guard/.intellijPlatform/

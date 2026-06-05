@@ -51,6 +51,7 @@
 │           └── demo.ts     # 内置演示接口
 ├── web/                    # 前端（Vite + React）
 │   └── src/{pages,components,lib}
+├── idea-clean-guard/       # IntelliJ IDEA 插件：AI 文件识别与自动清理
 └── package.json            # 一键安装 / 启动两端
 ```
 
