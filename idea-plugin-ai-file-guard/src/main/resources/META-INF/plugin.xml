@@ -1,0 +1,54 @@
+<idea-plugin>
+    <id>com.aifileguard</id>
+    <name>AI File Guard</name>
+    <vendor email="support@aifileguard.dev" url="https://github.com/">AI File Guard</vendor>
+
+    <description><![CDATA[
+        <h2>AI File Guard / AI 文件卫士</h2>
+        <p>
+            Detects AI-generated and junk files in your project and keeps your workspace clean.
+            识别 AI 生成的文件并保持工程目录干净。
+        </p>
+        <ul>
+            <li><b>AI generated &amp; useless</b> files → cleaned up / 清理</li>
+            <li><b>Temporary (tmp)</b> files → cleaned up / 清理</li>
+            <li><b>Project config / AI config</b> files → added to .gitignore (ignore/exclude) / 加入忽略</li>
+            <li><b>Suspicious / unknown</b> files → one-click quarantine to a target dir, or one-click delete / 一键转存或删除</li>
+        </ul>
+        <p>Configurable OpenAI-compatible <b>API Key</b> and <b>Base URL</b> for AI-assisted classification.</p>
+    ]]></description>
+
+    <depends>com.intellij.modules.platform</depends>
+
+    <extensions defaultExtensionNs="com.intellij">
+        <applicationService serviceImplementation="com.aifileguard.settings.AiGuardSettings"/>
+        <applicationConfigurable
+                parentId="tools"
+                instance="com.aifileguard.settings.AiGuardConfigurable"
+                id="com.aifileguard.settings.AiGuardConfigurable"
+                displayName="AI File Guard"/>
+
+        <toolWindow id="AI File Guard"
+                    anchor="right"
+                    secondary="true"
+                    icon="AllIcons.Actions.Cleanup"
+                    factoryClass="com.aifileguard.toolwindow.AiGuardToolWindowFactory"/>
+
+        <postStartupActivity implementation="com.aifileguard.startup.ImportScanActivity"/>
+
+        <notificationGroup id="AI File Guard"
+                           displayType="BALLOON"/>
+    </extensions>
+
+    <applicationListeners>
+    </applicationListeners>
+
+    <actions>
+        <action id="com.aifileguard.action.ScanAction"
+                class="com.aifileguard.action.ScanAction"
+                text="AI File Guard: Scan Project"
+                description="Scan the current project for AI-generated, temporary and suspicious files">
+            <add-to-group group-id="ToolsMenu" anchor="last"/>
+        </action>
+    </actions>
+</idea-plugin>
