@@ -11,3 +11,5 @@ web/dist/
 coverage/
 .playwright/
 *.tsbuildinfo
+.gradle/
+idea-plugin/build/

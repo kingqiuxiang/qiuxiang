@@ -1,0 +1,44 @@
+<idea-plugin>
+    <id>com.lingce.aifilecleaner</id>
+    <name>LingCe AI File Cleaner</name>
+    <vendor>LingCe</vendor>
+
+    <description><![CDATA[
+        Keeps local projects clean by classifying AI-generated, temporary, project configuration,
+        and suspicious files. Supports OpenAI-compatible API configuration, automatic temporary
+        file cleanup, ignore/exclude handling, and one-click quarantine or deletion for files
+        that need human confirmation.
+    ]]></description>
+
+    <depends>com.intellij.modules.platform</depends>
+
+    <extensions defaultExtensionNs="com.intellij">
+        <projectService serviceImplementation="com.lingce.aifilecleaner.AiFileCleanerProjectService"/>
+        <applicationConfigurable
+                id="com.lingce.aifilecleaner.settings"
+                displayName="AI File Cleaner"
+                instance="com.lingce.aifilecleaner.settings.AiFileCleanerConfigurable"/>
+        <postStartupActivity implementation="com.lingce.aifilecleaner.AiFileCleanerStartupActivity"/>
+        <toolWindow
+                id="AI Cleaner"
+                anchor="right"
+                factoryClass="com.lingce.aifilecleaner.ui.AiFileCleanerToolWindowFactory"/>
+        <notificationGroup id="AI File Cleaner" displayType="BALLOON"/>
+    </extensions>
+
+    <actions>
+        <group id="com.lingce.aifilecleaner.Actions"
+               text="AI File Cleaner"
+               description="Clean AI-generated, temporary, and suspicious local files">
+            <add-to-group group-id="ToolsMenu" anchor="last"/>
+            <action id="com.lingce.aifilecleaner.ScanProject"
+                    class="com.lingce.aifilecleaner.actions.ScanProjectAction"
+                    text="Scan Project for AI/Tmp Files"
+                    description="Scan the current project and classify files for cleanup"/>
+            <action id="com.lingce.aifilecleaner.ScanSelectedFiles"
+                    class="com.lingce.aifilecleaner.actions.ScanSelectedFilesAction"
+                    text="Scan Selected Files"
+                    description="Classify selected files for cleanup"/>
+        </group>
+    </actions>
+</idea-plugin>
