@@ -1,0 +1,11 @@
+{
+  "name": "apipilot-sample-project",
+  "version": "1.0.0",
+  "private": true,
+  "description": "被测示例项目：最小接口服务，用于演示 ApiPilot 全流程",
+  "type": "module",
+  "scripts": {
+    "dev": "node index.js",
+    "start": "node index.js"
+  }
+}

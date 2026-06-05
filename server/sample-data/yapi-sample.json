@@ -1,0 +1,70 @@
+[
+  {
+    "_id": 101,
+    "name": "用户中心",
+    "desc": "登录、注册、资料",
+    "list": [
+      {
+        "_id": 1001,
+        "title": "用户登录",
+        "method": "POST",
+        "path": "/api/user/login",
+        "status": "done",
+        "req_body_type": "json",
+        "req_body_other": "{\"type\":\"object\",\"required\":[\"username\",\"password\"],\"properties\":{\"username\":{\"type\":\"string\",\"description\":\"用户名/手机号\"},\"password\":{\"type\":\"string\",\"description\":\"登录密码\"},\"remember\":{\"type\":\"boolean\",\"description\":\"记住登录\"}}}",
+        "res_body_type": "json",
+        "res_body": "{\"type\":\"object\",\"properties\":{\"code\":{\"type\":\"integer\"},\"message\":{\"type\":\"string\"},\"data\":{\"type\":\"object\",\"properties\":{\"token\":{\"type\":\"string\"},\"userId\":{\"type\":\"integer\"}}}}}",
+        "markdown": "登录成功返回 token。code=0 表示成功。"
+      },
+      {
+        "_id": 1002,
+        "title": "获取用户信息",
+        "method": "GET",
+        "path": "/api/user/profile",
+        "status": "done",
+        "req_query": [
+          { "name": "userId", "required": "1", "desc": "用户ID", "example": "1" }
+        ],
+        "req_headers": [
+          { "name": "Authorization", "required": "1", "desc": "Bearer token", "example": "Bearer demo-token" }
+        ],
+        "res_body_type": "json",
+        "res_body": "{\"type\":\"object\",\"properties\":{\"code\":{\"type\":\"integer\"},\"data\":{\"type\":\"object\",\"properties\":{\"userId\":{\"type\":\"integer\"},\"username\":{\"type\":\"string\"},\"email\":{\"type\":\"string\"}}}}}"
+      }
+    ]
+  },
+  {
+    "_id": 102,
+    "name": "订单",
+    "desc": "下单、查询",
+    "list": [
+      {
+        "_id": 2001,
+        "title": "创建订单",
+        "method": "POST",
+        "path": "/api/order/create",
+        "status": "undone",
+        "req_headers": [
+          { "name": "Authorization", "required": "1", "desc": "Bearer token", "example": "Bearer demo-token" }
+        ],
+        "req_body_type": "json",
+        "req_body_other": "{\"type\":\"object\",\"required\":[\"productId\",\"quantity\"],\"properties\":{\"productId\":{\"type\":\"integer\",\"description\":\"商品ID\"},\"quantity\":{\"type\":\"integer\",\"description\":\"数量\"},\"couponCode\":{\"type\":\"string\",\"description\":\"优惠券码\"},\"address\":{\"type\":\"object\",\"properties\":{\"receiver\":{\"type\":\"string\"},\"phone\":{\"type\":\"string\"},\"detail\":{\"type\":\"string\"}}}}}",
+        "res_body_type": "json",
+        "res_body": "{\"type\":\"object\",\"properties\":{\"code\":{\"type\":\"integer\"},\"data\":{\"type\":\"object\",\"properties\":{\"orderId\":{\"type\":\"string\"},\"amount\":{\"type\":\"number\"}}}}}",
+        "markdown": "创建订单需登录态。"
+      },
+      {
+        "_id": 2002,
+        "title": "订单详情",
+        "method": "GET",
+        "path": "/api/order/:orderId",
+        "status": "undone",
+        "req_params": [
+          { "name": "orderId", "desc": "订单ID", "example": "ORD20240001" }
+        ],
+        "res_body_type": "json",
+        "res_body": "{\"type\":\"object\",\"properties\":{\"code\":{\"type\":\"integer\"},\"data\":{\"type\":\"object\"}}}"
+      }
+    ]
+  }
+]
