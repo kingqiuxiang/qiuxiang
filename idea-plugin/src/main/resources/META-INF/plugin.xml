@@ -1,0 +1,54 @@
+<idea-plugin>
+    <id>com.lingce.aijanitor</id>
+    <name>AI File Janitor</name>
+    <version>1.0.0</version>
+    <vendor email="support@lingce.dev" url="https://github.com/lingce">LingCe</vendor>
+
+    <description><![CDATA[
+        <h2>AI File Janitor / AI 文件清道夫</h2>
+        <p>
+            Keep your project clean. This plugin scans a project (great right after you import it)
+            and classifies files into categories using heuristics plus an optional AI model
+            (any OpenAI-compatible API):
+        </p>
+        <ul>
+            <li><b>AI-generated junk</b> — useless files left behind by AI tools &rarr; delete.</li>
+            <li><b>Temporary files</b> — *.tmp, *.bak, caches, OS junk &rarr; delete.</li>
+            <li><b>Project / AI config files</b> — *.cursorrules, tsconfig.json, etc. &rarr; move into an
+                ignored &amp; excluded folder.</li>
+            <li><b>Suspicious / unknown files</b> &rarr; one-click archive to a chosen directory, or one-click delete.</li>
+        </ul>
+        <p>Configure your API Key and Base URL in <b>Settings &rarr; Tools &rarr; AI File Janitor</b>.</p>
+    ]]></description>
+
+    <change-notes><![CDATA[
+        <ul><li>1.0.0 — Initial release.</li></ul>
+    ]]></change-notes>
+
+    <depends>com.intellij.modules.platform</depends>
+
+    <extensions defaultExtensionNs="com.intellij">
+        <applicationService serviceImplementation="com.lingce.aijanitor.settings.AiJanitorSettings"/>
+        <applicationConfigurable
+                parentId="tools"
+                id="com.lingce.aijanitor.settings"
+                displayName="AI File Janitor"
+                instance="com.lingce.aijanitor.settings.AiJanitorConfigurable"/>
+        <projectService serviceImplementation="com.lingce.aijanitor.core.JanitorController"/>
+        <toolWindow id="AI File Janitor"
+                    anchor="right"
+                    icon="AllIcons.Actions.GC"
+                    factoryClass="com.lingce.aijanitor.ui.AiJanitorToolWindowFactory"/>
+        <postStartupActivity implementation="com.lingce.aijanitor.startup.AiJanitorStartup"/>
+        <notificationGroup id="AI File Janitor" displayType="BALLOON"/>
+    </extensions>
+
+    <actions>
+        <action id="com.lingce.aijanitor.ScanProjectAction"
+                class="com.lingce.aijanitor.actions.ScanProjectAction"
+                text="AI 清理：扫描项目"
+                description="Scan project for AI-generated, temporary, config and suspicious files">
+            <add-to-group group-id="ToolsMenu" anchor="last"/>
+        </action>
+    </actions>
+</idea-plugin>
