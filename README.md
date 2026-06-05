@@ -87,6 +87,12 @@ YAPI_TOKEN=your_project_token
 
 > 未配置 YAPI / AI 时，平台自动进入**演示模式**：使用内置接口与启发式参数生成，完整体验全流程。
 
+## 🧩 Cursor XMind MCP（Windows 本地画图）
+
+仓库内提供了一个独立 MCP 服务，可让 Cursor 按需求生成 `.xmind` 思维导图，并拉起 Windows 本地 XMind 打开文件。
+
+详见：[mcp/xmind/README.md](mcp/xmind/README.md)
+
 ### 启用真实浏览器页面检测（可选）
 
 ```bash
