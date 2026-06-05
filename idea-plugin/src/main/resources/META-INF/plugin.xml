@@ -11,6 +11,7 @@
 
     <extensions defaultExtensionNs="com.intellij">
         <notificationGroup id="AI File Guardian" displayType="BALLOON" isLogByDefault="true"/>
+        <postStartupActivity implementation="io.lingce.ideaguardian.startup.ScanOnOpenActivity"/>
         <applicationConfigurable
                 id="io.lingce.ideaguardian.settings"
                 parentId="tools"
