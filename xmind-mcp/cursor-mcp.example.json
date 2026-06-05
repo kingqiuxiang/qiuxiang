@@ -1,0 +1,13 @@
+{
+  "mcpServers": {
+    "xmind": {
+      "command": "node",
+      "args": ["C:\\path\\to\\your\\repo\\xmind-mcp\\dist\\index.js"],
+      "env": {
+        "XMIND_OUTPUT_PATH": "C:\\Users\\你的用户名\\Documents\\XmindFiles",
+        "XMIND_AUTO_OPEN": "true",
+        "XMIND_PATH": "C:\\Users\\你的用户名\\AppData\\Local\\Programs\\XMind\\XMind.exe"
+      }
+    }
+  }
+}
