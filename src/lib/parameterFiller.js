@@ -39,7 +39,7 @@ function exampleValue(field) {
 }
 
 export function guessValue(name, type = "string", description = "") {
-  const key = `${name} ${description}`.toLowerCase();
+  const key = `${name} ${description}`.trim().toLowerCase();
   const normalizedType = normalizeType(type);
 
   if (key.includes("email")) return "tester@example.com";
