@@ -105,6 +105,21 @@ cd server && npm i playwright && npx playwright install chromium
 | devWebUrl | 开发环境前端地址 | `http://localhost:3000` |
 | 启动命令 | 一键启动所执行命令 | `npm run dev` / `mvn spring-boot:run` |
 
+## 🧩 Cursor XMind MCP（Windows 本地画图）
+
+仓库内置了一个独立的 XMind MCP 服务，位于 `mcp/xmind`。配置到 Cursor 后，你可以在 Cursor 聊天中描述需求，让它生成本地 `.xmind` 文件并自动拉起 Windows 本机 XMind 打开。
+
+```bash
+cd mcp/xmind
+npm install
+```
+
+完整 Windows MCP 配置与示例见 [`mcp/xmind/README.md`](mcp/xmind/README.md)。根目录也提供了快捷启动脚本：
+
+```bash
+npm run mcp:xmind
+```
+
 ## 📡 主要 API
 
 | Method | Path | 说明 |

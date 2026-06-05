@@ -1,0 +1,22 @@
+{
+  "name": "@lingce/xmind-mcp",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Cursor MCP server that creates and opens local XMind files on demand.",
+  "type": "module",
+  "bin": {
+    "xmind-mcp": "./src/index.js"
+  },
+  "scripts": {
+    "start": "node src/index.js",
+    "check": "node --check src/index.js"
+  },
+  "engines": {
+    "node": ">=18"
+  },
+  "dependencies": {
+    "@modelcontextprotocol/sdk": "^1.29.0",
+    "fflate": "^0.8.3",
+    "zod": "^4.4.3"
+  }
+}

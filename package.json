@@ -10,7 +10,8 @@
     "dev:server": "npm --prefix server run dev",
     "dev:web": "npm --prefix web run dev",
     "build": "npm --prefix web run build",
-    "start": "npm --prefix server run start"
+    "start": "npm --prefix server run start",
+    "mcp:xmind": "npm --prefix mcp/xmind run start"
   },
   "devDependencies": {
     "concurrently": "^9.1.0"
