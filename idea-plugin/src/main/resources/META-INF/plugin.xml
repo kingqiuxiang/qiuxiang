@@ -1,0 +1,78 @@
+<idea-plugin>
+    <id>com.lingce.cleankeeper</id>
+    <name>AI File CleanKeeper</name>
+    <vendor email="support@lingce.dev" url="https://github.com">LingCe</vendor>
+    <description><![CDATA[
+        <p>智能识别 AI 生成文件、临时文件与配置文件，保持本地工作区干净。</p>
+        <ul>
+            <li>导入/新建文件时自动扫描分类</li>
+            <li>无用 AI 产物与临时文件自动清理</li>
+            <li>项目配置与 AI 配置文件自动加入 .gitignore / IDE Exclude</li>
+            <li>可疑文件支持一键隔离转存或删除</li>
+            <li>支持配置 OpenAI 兼容 API Key 与 Base URL</li>
+        </ul>
+    ]]></description>
+
+    <depends>com.intellij.modules.platform</depends>
+
+    <extensions defaultExtensionNs="com.intellij">
+        <applicationConfigurable
+                parentId="tools"
+                instance="com.lingce.cleankeeper.settings.CleanKeeperConfigurable"
+                id="com.lingce.cleankeeper.settings"
+                displayName="AI File CleanKeeper"/>
+
+        <applicationService
+                serviceImplementation="com.lingce.cleankeeper.settings.CleanKeeperSettings"/>
+
+        <projectService
+                serviceImplementation="com.lingce.cleankeeper.service.CleanupService"/>
+
+        <postStartupActivity
+                implementation="com.lingce.cleankeeper.listener.ProjectStartupActivity"/>
+
+        <toolWindow
+                id="AI CleanKeeper"
+                anchor="bottom"
+                factoryClass="com.lingce.cleankeeper.ui.CleanKeeperToolWindowFactory"
+                icon="/icons/cleankeeper.svg"/>
+
+        <notificationGroup
+                id="AI File CleanKeeper"
+                displayType="BALLOON"/>
+    </extensions>
+
+    <actions>
+        <group id="CleanKeeper.FilePopup" text="AI CleanKeeper" popup="true">
+            <add-to-group group-id="ProjectViewPopupMenu" anchor="last"/>
+            <action id="CleanKeeper.ScanFile"
+                    class="com.lingce.cleankeeper.action.ScanSelectedFileAction"
+                    text="扫描此文件"
+                    description="使用规则与 AI 扫描选中文件"/>
+            <action id="CleanKeeper.QuarantineFile"
+                    class="com.lingce.cleankeeper.action.QuarantineFileAction"
+                    text="隔离转存"
+                    description="将文件转存到隔离目录"/>
+            <action id="CleanKeeper.DeleteFile"
+                    class="com.lingce.cleankeeper.action.DeleteFileAction"
+                    text="删除文件"
+                    description="删除选中文件"/>
+            <action id="CleanKeeper.AddToIgnore"
+                    class="com.lingce.cleankeeper.action.AddToIgnoreAction"
+                    text="加入 Ignore/Exclude"
+                    description="将文件加入 .gitignore 与 IDE Exclude"/>
+        </group>
+
+        <group id="CleanKeeper.MainMenu" text="AI CleanKeeper" popup="true">
+            <add-to-group group-id="ToolsMenu" anchor="last"/>
+            <action id="CleanKeeper.ScanProject"
+                    class="com.lingce.cleankeeper.action.ScanProjectAction"
+                    text="扫描整个项目"
+                    description="扫描项目中可疑与 AI 生成文件"/>
+            <action id="CleanKeeper.OpenSettings"
+                    class="com.lingce.cleankeeper.action.OpenSettingsAction"
+                    text="打开设置"
+                    description="配置 API Key、Base URL 与清理策略"/>
+        </group>
+    </actions>
+</idea-plugin>
