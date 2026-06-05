@@ -94,6 +94,33 @@ cd server && npm i playwright && npx playwright install chromium
 ```
 安装后「前端页面测试」会自动切换为 Playwright 真实渲染检测（含 JS 报错捕获、根节点挂载校验）。
 
+## 🧩 Cursor XMind MCP（Windows 本地画图）
+
+仓库内新增 `mcp-xmind/`，可作为 Cursor 的本地 MCP 服务使用：Cursor 根据你的需求整理出思维导图大纲，MCP 生成 `.xmind` 文件并拉起本机 XMind 打开。
+
+```bash
+npm install
+npm run build:mcp:xmind
+```
+
+Windows Cursor MCP 配置示例（路径替换为你的本地仓库路径）：
+
+```json
+{
+  "mcpServers": {
+    "xmind": {
+      "command": "node",
+      "args": ["C:\\path\\to\\repo\\mcp-xmind\\dist\\index.js"],
+      "env": {
+        "XMIND_EXE": "C:\\Program Files\\Xmind\\Xmind.exe"
+      }
+    }
+  }
+}
+```
+
+详细说明见 [`mcp-xmind/README.md`](./mcp-xmind/README.md)。
+
 ## 🔌 项目配置项说明
 
 | 字段 | 含义 | 示例 |
