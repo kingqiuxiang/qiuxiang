@@ -1,0 +1,33 @@
+<idea-plugin>
+    <id>com.lingce.clean-guardian</id>
+    <name>Clean Guardian</name>
+    <vendor email="support@lingce.local">LingCe</vendor>
+
+    <description><![CDATA[
+        自动识别并清理 AI 生成垃圾文件、tmp 文件，维护本地项目整洁；支持可疑文件一键转存或删除。
+    ]]></description>
+
+    <depends>com.intellij.modules.platform</depends>
+
+    <extensions defaultExtensionNs="com.intellij">
+        <projectService serviceImplementation="com.lingce.cleanguardian.CleanGuardianProjectService"/>
+        <postStartupActivity implementation="com.lingce.cleanguardian.CleanGuardianStartupActivity"/>
+        <applicationConfigurable
+                id="clean.guardian.settings"
+                displayName="Clean Guardian"
+                instance="com.lingce.cleanguardian.CleanGuardianConfigurable"/>
+        <notificationGroup
+                id="Clean Guardian Notifications"
+                displayType="BALLOON"
+                isLogByDefault="true"/>
+    </extensions>
+
+    <actions>
+        <action id="CleanGuardian.ScanAndClean"
+                class="com.lingce.cleanguardian.ScanAndCleanProjectAction"
+                text="Scan and Clean Project (Clean Guardian)"
+                description="扫描并清理 AI/tmp/可疑文件">
+            <add-to-group group-id="ToolsMenu" anchor="last"/>
+        </action>
+    </actions>
+</idea-plugin>
