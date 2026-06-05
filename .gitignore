@@ -1,0 +1,5 @@
+node_modules/
+config/ai-yapi-runner.local.json
+.ai-yapi-runner/
+npm-debug.log*
+coverage/

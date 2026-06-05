@@ -1,0 +1,24 @@
+{
+  "project": {
+    "name": "qiuxiang",
+    "root": ".",
+    "startCommand": "",
+    "healthUrl": "",
+    "frontendUrl": ""
+  },
+  "yapi": {
+    "baseUrl": "",
+    "token": "",
+    "projectId": ""
+  },
+  "ai": {
+    "enabled": false,
+    "endpoint": "https://api.openai.com/v1/chat/completions",
+    "apiKey": "",
+    "model": "gpt-4o-mini"
+  },
+  "runner": {
+    "targetBaseUrl": "http://localhost:8080",
+    "timeoutMs": 15000
+  }
+}

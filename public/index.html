@@ -1,0 +1,139 @@
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>AI YAPI Runner</title>
+    <link rel="stylesheet" href="/styles.css" />
+  </head>
+  <body>
+    <main class="shell">
+      <section class="hero">
+        <div>
+          <p class="eyebrow">AI Dev Workflow Console</p>
+          <h1>YAPI 参数读取、AI 一键填充、项目启动与接口测试闭环</h1>
+          <p class="hero-copy">
+            读取 YAPI 接口定义和项目代码上下文，自动生成开发环境请求参数，并在写完接口后快速启动、调用和验证。
+          </p>
+        </div>
+        <div class="hero-card">
+          <span class="pulse"></span>
+          <strong id="statusTitle">系统初始化中</strong>
+          <small id="statusText">正在读取本地配置...</small>
+        </div>
+      </section>
+
+      <section class="grid">
+        <article class="panel setup-panel">
+          <div class="panel-title">
+            <span>01</span>
+            <h2>连接配置</h2>
+          </div>
+          <div class="form-grid">
+            <label>
+              YAPI 地址
+              <input id="yapiBaseUrl" placeholder="https://yapi.example.com" />
+            </label>
+            <label>
+              YAPI Project ID
+              <input id="yapiProjectId" placeholder="123" />
+            </label>
+            <label>
+              YAPI Token
+              <input id="yapiToken" type="password" placeholder="project token" />
+            </label>
+            <label>
+              开发环境后端
+              <input id="targetBaseUrl" placeholder="http://localhost:8080" />
+            </label>
+            <label>
+              前端页面地址
+              <input id="frontendUrl" placeholder="http://localhost:5173" />
+            </label>
+            <label>
+              启动命令
+              <input id="startCommand" placeholder="npm run dev / mvn spring-boot:run" />
+            </label>
+            <label>
+              AI Endpoint
+              <input id="aiEndpoint" placeholder="https://api.openai.com/v1/chat/completions" />
+            </label>
+            <label>
+              AI Model
+              <input id="aiModel" placeholder="gpt-4o-mini" />
+            </label>
+            <label class="wide">
+              AI API Key
+              <input id="aiApiKey" type="password" placeholder="未填写时使用本地规则填充" />
+            </label>
+          </div>
+          <div class="actions">
+            <button id="saveConfig" class="ghost">保存到浏览器</button>
+            <button id="scanCode">扫描代码上下文</button>
+            <button id="startProject" class="secondary">快捷启动项目</button>
+          </div>
+        </article>
+
+        <article class="panel">
+          <div class="panel-title">
+            <span>02</span>
+            <h2>YAPI 接口</h2>
+          </div>
+          <div class="actions">
+            <button id="loadInterfaces">读取接口列表</button>
+            <button id="fillParams" class="secondary">AI 一键填参</button>
+          </div>
+          <div id="interfaceList" class="interface-list empty">
+            暂无接口，点击“读取接口列表”。
+          </div>
+        </article>
+
+        <article class="panel request-panel">
+          <div class="panel-title">
+            <span>03</span>
+            <h2>请求参数</h2>
+          </div>
+          <textarea id="requestEditor" spellcheck="false" placeholder="AI 填充结果会显示在这里"></textarea>
+          <div class="actions">
+            <button id="runTest">运行接口测试</button>
+            <button id="runWorkflow" class="primary">一键闭环</button>
+          </div>
+        </article>
+
+        <article class="panel timeline-panel">
+          <div class="panel-title">
+            <span>04</span>
+            <h2>执行结果</h2>
+          </div>
+          <div id="timeline" class="timeline"></div>
+          <pre id="resultBox" class="result-box">等待操作...</pre>
+        </article>
+      </section>
+
+      <section class="panel frontend-panel">
+        <div class="panel-title">
+          <span>05</span>
+          <h2>前端页面辅助测试</h2>
+        </div>
+        <p>
+          配置前端页面地址后，可以在这里预览或新窗口打开开发页面；接口调用由本工具后端代理执行，避免浏览器 CORS 干扰。
+        </p>
+        <div class="actions">
+          <button id="openFrontend" class="ghost">打开前端页面</button>
+          <button id="refreshPreview" class="secondary">刷新预览</button>
+        </div>
+        <iframe id="frontendPreview" title="开发环境前端预览"></iframe>
+      </section>
+    </main>
+
+    <template id="interfaceItemTemplate">
+      <button class="interface-item">
+        <span class="method"></span>
+        <span class="name"></span>
+        <small class="path"></small>
+      </button>
+    </template>
+
+    <script src="/app.js" type="module"></script>
+  </body>
+</html>
