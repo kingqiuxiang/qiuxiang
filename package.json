@@ -1,0 +1,18 @@
+{
+  "name": "apipilot",
+  "version": "1.0.0",
+  "private": true,
+  "description": "APIPilot · AI 接口测试驾驶舱 — 接入 YAPI、以项目代码为基准 AI 一键填参、快捷启动项目并自动测试",
+  "scripts": {
+    "install:all": "npm --prefix server install && npm --prefix web install",
+    "dev": "concurrently -n server,web -c cyan,magenta \"npm --prefix server run dev\" \"npm --prefix web run dev\"",
+    "dev:server": "npm --prefix server run dev",
+    "dev:web": "npm --prefix web run dev",
+    "build": "npm --prefix web run build",
+    "start": "npm --prefix server start",
+    "typecheck": "npm --prefix server run typecheck"
+  },
+  "devDependencies": {
+    "concurrently": "^9.0.1"
+  }
+}

@@ -1,0 +1,72 @@
+@import "tailwindcss";
+
+@theme {
+  --color-ink: #070b18;
+  --color-ink-2: #0c1226;
+  --color-panel: #11182f;
+  --color-line: #1e2742;
+  --color-accent: #818cf8;
+  --color-accent-2: #22d3ee;
+  --font-sans: "Inter", "PingFang SC", "Microsoft YaHei", system-ui, sans-serif;
+}
+
+:root {
+  color-scheme: dark;
+}
+
+html,
+body,
+#root {
+  height: 100%;
+}
+
+body {
+  margin: 0;
+  background:
+    radial-gradient(1100px 600px at 85% -10%, rgba(34, 211, 238, 0.12), transparent 60%),
+    radial-gradient(900px 500px at 0% 10%, rgba(129, 140, 248, 0.14), transparent 55%),
+    #070b18;
+  color: #e7ecf6;
+  font-family: var(--font-sans);
+  -webkit-font-smoothing: antialiased;
+}
+
+::-webkit-scrollbar {
+  width: 9px;
+  height: 9px;
+}
+::-webkit-scrollbar-thumb {
+  background: #283155;
+  border-radius: 9px;
+}
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+@layer utilities {
+  .glass {
+    background: linear-gradient(180deg, rgba(255, 255, 255, 0.045), rgba(255, 255, 255, 0.015));
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    backdrop-filter: blur(14px);
+  }
+  .glow {
+    box-shadow: 0 0 0 1px rgba(129, 140, 248, 0.25), 0 18px 60px -22px rgba(34, 211, 238, 0.35);
+  }
+  .text-gradient {
+    background: linear-gradient(90deg, #a5b4fc, #67e8f9);
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+  }
+}
+
+.shimmer {
+  background: linear-gradient(100deg, rgba(255, 255, 255, 0.04) 30%, rgba(255, 255, 255, 0.12) 50%, rgba(255, 255, 255, 0.04) 70%);
+  background-size: 200% 100%;
+  animation: shimmer 1.4s infinite;
+}
+@keyframes shimmer {
+  to {
+    background-position: -200% 0;
+  }
+}
