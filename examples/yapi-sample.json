@@ -1,0 +1,53 @@
+{
+  "data": {
+    "list": [
+      {
+        "title": "创建用户",
+        "method": "POST",
+        "path": "/api/users",
+        "req_headers": [
+          {
+            "name": "Authorization",
+            "type": "string",
+            "required": "1",
+            "example": "Bearer demo-token",
+            "desc": "登录令牌"
+          }
+        ],
+        "req_query": [
+          {
+            "name": "tenantId",
+            "type": "integer",
+            "required": "1",
+            "example": "10001",
+            "desc": "租户 ID"
+          }
+        ],
+        "req_body_other": "{\"type\":\"object\",\"properties\":{\"name\":{\"type\":\"string\",\"description\":\"用户姓名\"},\"email\":{\"type\":\"string\",\"format\":\"email\"},\"phone\":{\"type\":\"string\"},\"roleIds\":{\"type\":\"array\",\"items\":{\"type\":\"integer\"}},\"enabled\":{\"type\":\"boolean\"}},\"required\":[\"name\",\"email\"]}"
+      },
+      {
+        "title": "查询用户详情",
+        "method": "GET",
+        "path": "/api/users/{id}",
+        "req_params": [
+          {
+            "name": "id",
+            "type": "integer",
+            "required": "1",
+            "example": "10001",
+            "desc": "用户 ID"
+          }
+        ],
+        "req_query": [
+          {
+            "name": "includePermissions",
+            "type": "boolean",
+            "required": "0",
+            "example": "true",
+            "desc": "是否返回权限"
+          }
+        ]
+      }
+    ]
+  }
+}
