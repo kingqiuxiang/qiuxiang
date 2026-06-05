@@ -1,0 +1,25 @@
+{
+  "name": "xmind-local",
+  "version": "1.0.0",
+  "description": "MCP server for creating and opening local XMind files on Windows",
+  "type": "module",
+  "main": "src/index.js",
+  "scripts": {
+    "start": "node src/index.js",
+    "dev": "node --watch src/index.js",
+    "check": "node --check src/index.js"
+  },
+  "keywords": [
+    "mcp",
+    "xmind",
+    "cursor",
+    "windows"
+  ],
+  "license": "MIT",
+  "dependencies": {
+    "@modelcontextprotocol/sdk": "^1.29.0",
+    "jszip": "^3.10.1",
+    "xmind-generator": "^1.0.1",
+    "zod": "^4.4.3"
+  }
+}

@@ -1,0 +1,12 @@
+{
+  "mcpServers": {
+    "xmind-local": {
+      "command": "node",
+      "args": ["D:\\\\workspace\\\\mcp\\\\xmind-local\\\\src\\\\index.js"],
+      "env": {
+        "XMIND_EXECUTABLE": "C:\\\\Program Files\\\\Xmind\\\\Xmind.exe",
+        "XMIND_OUTPUT_DIR": "D:\\\\xmind-output"
+      }
+    }
+  }
+}
