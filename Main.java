@@ -202,7 +202,8 @@ public class Main {
     private static List<Object> normalizeYapiList(Object data) {
         Object list = data;
         if (data instanceof Map<?, ?> map) {
-            list = map.getOrDefault("list", Collections.emptyList());
+            Object mappedList = map.get("list");
+            list = mappedList == null ? Collections.emptyList() : mappedList;
         }
         List<Object> result = new ArrayList<>();
         for (Object item : asList(list)) {
@@ -886,6 +887,22 @@ public class Main {
             builder.append(encode(entry.getKey())).append('=').append(encode(stringValue(entry.getValue())));
         }
         return builder.toString();
+    }
+
+    private static Map<String, String> parseQuery(String rawQuery) {
+        Map<String, String> result = new LinkedHashMap<>();
+        if (rawQuery == null || rawQuery.isBlank()) {
+            return result;
+        }
+        for (String pair : rawQuery.split("&")) {
+            int index = pair.indexOf('=');
+            if (index < 0) {
+                result.put(pair, "");
+            } else {
+                result.put(pair.substring(0, index), pair.substring(index + 1));
+            }
+        }
+        return result;
     }
 
     private static String encode(String value) {
