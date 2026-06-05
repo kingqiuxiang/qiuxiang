@@ -122,3 +122,11 @@ cd server && npm i playwright && npx playwright install chromium
 
 - 所有密钥仅保存在本地 `server/data/db.json`，不会上传第三方。
 - 平台会向你配置的「开发环境地址」实际发起 HTTP 请求，请确保仅指向你有权访问的内网/本地服务。
+
+## 🧩 附加工具：XMind MCP（Windows 本机）
+
+仓库内提供了一个可给 Cursor 使用的 MCP Server：
+
+- 目录：`mcp/xmind-local-mcp`
+- 能力：将需求文本/结构化大纲生成 `.xmind` 并尝试自动拉起本机 XMind
+- 使用说明：见 `mcp/xmind-local-mcp/README.md`
