@@ -1,0 +1,11 @@
+{
+  "mcpServers": {
+    "xmind": {
+      "command": "node",
+      "args": ["C:\\Users\\你的用户名\\path\\to\\xmind-mcp\\src\\index.js"],
+      "env": {
+        "XMIND_OUTPUT_DIR": "C:\\Users\\你的用户名\\Desktop\\XMind"
+      }
+    }
+  }
+}
