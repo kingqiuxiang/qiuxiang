@@ -1,0 +1,8 @@
+{
+  "mcpServers": {
+    "xmind": {
+      "command": "node",
+      "args": ["C:\\\\path\\\\to\\\\repo\\\\mcp-xmind\\\\src\\\\index.js"]
+    }
+  }
+}

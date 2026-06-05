@@ -118,6 +118,10 @@ cd server && npm i playwright && npx playwright install chromium
 | `GET` | `/api/projects/:id/runner/stream` | SSE 实时启动日志 |
 | `POST` | `/api/projects/:id/page-test` | 前端页面检测 |
 
+## 🧩 附：XMind MCP（让 Cursor 拉起本地 XMind 自动画图）
+
+仓库内置了一个独立的 MCP 服务 [`mcp-xmind/`](./mcp-xmind/)：在 **Cursor** 里直接对话提需求，AI 会把需求整理成层级结构，生成现代 `.xmind` 思维导图并**自动用本地 XMind 打开**（面向 Windows，兼容 macOS/Linux）。配置与用法见 [`mcp-xmind/README.md`](./mcp-xmind/README.md)。
+
 ## 🔒 说明
 
 - 所有密钥仅保存在本地 `server/data/db.json`，不会上传第三方。
