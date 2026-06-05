@@ -1,0 +1,71 @@
+<idea-plugin>
+    <id>com.lingce.aijanitor</id>
+    <name>AI File Janitor</name>
+    <vendor email="dev@lingce.local" url="https://github.com/">LingCe</vendor>
+
+    <description><![CDATA[
+        <h2>AI File Janitor / AI 文件清理助手</h2>
+        <p>
+        识别 AI 生成的文件并保持工作区干净。支持配置 OpenAI 兼容的 API Key 与 Base URL，
+        在导入/新增文件后自动检测：
+        </p>
+        <ul>
+            <li><b>AI 生成的无用文件</b> 与 <b>临时文件</b> → 及时清理（删除）</li>
+            <li><b>项目配置文件 / AI 工具配置文件</b> → 加入 .gitignore / 标记为 Excluded</li>
+            <li><b>可疑/不可预测的文件</b> → 一键转存到指定隔离目录，或一键删除</li>
+        </ul>
+        <p>未配置 API Key 时仅使用本地启发式规则，不会发起任何外部网络请求。</p>
+    ]]></description>
+
+    <depends>com.intellij.modules.platform</depends>
+
+    <extensions defaultExtensionNs="com.intellij">
+        <applicationService
+            serviceImplementation="com.lingce.aijanitor.settings.AiJanitorSettings"/>
+        <projectService
+            serviceImplementation="com.lingce.aijanitor.service.FileJanitorService"/>
+
+        <applicationConfigurable
+            parentId="tools"
+            instance="com.lingce.aijanitor.settings.AiJanitorConfigurable"
+            id="com.lingce.aijanitor.settings.AiJanitorConfigurable"
+            displayName="AI File Janitor"/>
+
+        <notificationGroup
+            id="AI File Janitor"
+            displayType="BALLOON"/>
+    </extensions>
+
+    <applicationListeners>
+        <listener
+            class="com.lingce.aijanitor.listener.ImportWatcher"
+            topic="com.intellij.openapi.vfs.newvfs.BulkFileListener"/>
+    </applicationListeners>
+
+    <actions>
+        <action
+            id="AiJanitor.ScanAndClean"
+            class="com.lingce.aijanitor.action.ScanAndCleanAction"
+            text="AI 文件清理：扫描并清理"
+            description="扫描所选范围（默认整个项目），识别 AI 生成/临时/配置/可疑文件并清理">
+            <add-to-group group-id="ToolsMenu" anchor="last"/>
+            <add-to-group group-id="ProjectViewPopupMenu" anchor="last"/>
+        </action>
+
+        <action
+            id="AiJanitor.QuarantineFiles"
+            class="com.lingce.aijanitor.action.QuarantineFilesAction"
+            text="AI 文件清理：转存到隔离目录"
+            description="将选中的文件移动到配置的隔离目录">
+            <add-to-group group-id="ProjectViewPopupMenu" anchor="last"/>
+        </action>
+
+        <action
+            id="AiJanitor.DeleteFiles"
+            class="com.lingce.aijanitor.action.DeleteFilesAction"
+            text="AI 文件清理：一键删除"
+            description="确认后永久删除选中的文件">
+            <add-to-group group-id="ProjectViewPopupMenu" anchor="last"/>
+        </action>
+    </actions>
+</idea-plugin>
