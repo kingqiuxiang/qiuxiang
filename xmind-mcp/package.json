@@ -1,0 +1,38 @@
+{
+  "name": "xmind-mcp",
+  "version": "1.0.0",
+  "description": "MCP server for creating XMind mind maps and opening them in local XMind on Windows",
+  "type": "module",
+  "main": "dist/index.js",
+  "bin": {
+    "xmind-mcp": "dist/index.js"
+  },
+  "scripts": {
+    "build": "tsc",
+    "start": "node dist/index.js",
+    "dev": "tsx src/index.ts",
+    "prepare": "npm run build"
+  },
+  "keywords": [
+    "mcp",
+    "xmind",
+    "mindmap",
+    "cursor"
+  ],
+  "author": "",
+  "license": "MIT",
+  "dependencies": {
+    "@modelcontextprotocol/sdk": "^1.25.3",
+    "adm-zip": "^0.5.16",
+    "zod": "^4.1.12"
+  },
+  "devDependencies": {
+    "@types/adm-zip": "^0.5.7",
+    "@types/node": "^24.10.1",
+    "tsx": "^4.22.4",
+    "typescript": "^5.9.3"
+  },
+  "engines": {
+    "node": ">=18"
+  }
+}
