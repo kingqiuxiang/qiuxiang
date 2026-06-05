@@ -31,6 +31,7 @@
 - **AI**：任意 OpenAI 兼容接口（OpenAI / DeepSeek / 通义千问 / Moonshot 等）
 - **存储**：本地 JSON 文件（零依赖，免数据库）
 - **浏览器自动化（可选）**：Playwright
+- **XMind MCP（可选）**：`xmind-mcp/` 提供 Cursor 可直接拉起的本地 MCP Server，用于生成并打开 XMind 脑图
 
 ## 📂 目录结构
 
@@ -51,6 +52,7 @@
 │           └── demo.ts     # 内置演示接口
 ├── web/                    # 前端（Vite + React）
 │   └── src/{pages,components,lib}
+├── xmind-mcp/              # Cursor 本地 MCP：按需求生成 .xmind 并拉起 XMind
 └── package.json            # 一键安装 / 启动两端
 ```
 
@@ -86,6 +88,18 @@ YAPI_TOKEN=your_project_token
 ```
 
 > 未配置 YAPI / AI 时，平台自动进入**演示模式**：使用内置接口与启发式参数生成，完整体验全流程。
+
+### Cursor + XMind MCP（可选）
+
+如果希望在 Cursor 中直接说“用 XMind 画一张 XXX 脑图”，进入 `xmind-mcp/` 安装并构建，然后把该 MCP 配到 Cursor：
+
+```bash
+cd xmind-mcp
+npm install
+npm run build
+```
+
+Windows 的 `mcp.json` 示例和 `XMIND_PATH` 配置见 [`xmind-mcp/README.md`](./xmind-mcp/README.md)。
 
 ### 启用真实浏览器页面检测（可选）
 
