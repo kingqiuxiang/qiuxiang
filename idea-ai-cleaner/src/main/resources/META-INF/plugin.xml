@@ -1,0 +1,34 @@
+<idea-plugin>
+    <id>com.lingce.idea.ai.cleaner</id>
+    <name>AI File Cleaner</name>
+    <vendor email="support@lingce.local" url="https://lingce.local">LingCe</vendor>
+
+    <description><![CDATA[
+        Identify AI-generated, temporary, and suspicious files after project import/open.
+        Auto-clean temporary/AI files, move config files to managed ignore/exclude folders,
+        and provide one-click suspicious file archive or delete actions.
+    ]]></description>
+
+    <depends>com.intellij.modules.platform</depends>
+
+    <extensions defaultExtensionNs="com.intellij">
+        <applicationService serviceImplementation="com.lingce.cleaner.settings.CleanerSettingsState"/>
+        <projectService serviceImplementation="com.lingce.cleaner.services.FileCleanupService"/>
+        <applicationConfigurable
+                id="com.lingce.cleaner.settings"
+                displayName="AI File Cleaner"
+                instance="com.lingce.cleaner.settings.CleanerConfigurable"/>
+        <postStartupActivity implementation="com.lingce.cleaner.startup.CleanupStartupActivity"/>
+        <notificationGroup id="AI File Cleaner" displayType="BALLOON" isLogByDefault="true"/>
+    </extensions>
+
+    <actions>
+        <action
+                id="com.lingce.cleaner.actions.ScanAndCleanNowAction"
+                class="com.lingce.cleaner.actions.ScanAndCleanNowAction"
+                text="AI File Cleaner: Scan and Clean Project"
+                description="Scan project files and auto-clean AI/tmp/config artifacts">
+            <add-to-group group-id="ToolsMenu" anchor="last"/>
+        </action>
+    </actions>
+</idea-plugin>
