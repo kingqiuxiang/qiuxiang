@@ -1,0 +1,37 @@
+{
+  "name": "cursor-xmind-mcp",
+  "version": "1.0.0",
+  "description": "Cursor MCP server — generate Xmind mind maps and open them in local Xmind (Windows)",
+  "type": "module",
+  "main": "dist/index.js",
+  "bin": {
+    "cursor-xmind-mcp": "dist/index.js"
+  },
+  "scripts": {
+    "build": "tsc",
+    "start": "node dist/index.js",
+    "dev": "tsx src/index.ts"
+  },
+  "keywords": [
+    "mcp",
+    "cursor",
+    "xmind",
+    "mind-map",
+    "windows"
+  ],
+  "license": "MIT",
+  "dependencies": {
+    "@modelcontextprotocol/sdk": "^1.12.1",
+    "jszip": "^3.10.1",
+    "xmind-generator": "^1.0.1",
+    "zod": "^3.24.2"
+  },
+  "devDependencies": {
+    "@types/node": "^22.13.10",
+    "tsx": "^4.19.3",
+    "typescript": "^5.8.2"
+  },
+  "engines": {
+    "node": ">=18"
+  }
+}
