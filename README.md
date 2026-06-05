@@ -28,6 +28,7 @@
 
 - **前端**：React 18 · TypeScript · Vite · TailwindCSS · Framer Motion · Zustand · lucide-react
 - **后端**：Node.js · Express · TypeScript（tsx 运行）· SSE 实时日志
+- **IDE 插件**：IntelliJ Platform Plugin · Java 17（AI 文件清理与 ignore 维护）
 - **AI**：任意 OpenAI 兼容接口（OpenAI / DeepSeek / 通义千问 / Moonshot 等）
 - **存储**：本地 JSON 文件（零依赖，免数据库）
 - **浏览器自动化（可选）**：Playwright
@@ -51,6 +52,7 @@
 │           └── demo.ts     # 内置演示接口
 ├── web/                    # 前端（Vite + React）
 │   └── src/{pages,components,lib}
+├── idea-plugin/            # IDEA 插件：AI/tmp/config 文件识别与清理
 └── package.json            # 一键安装 / 启动两端
 ```
 
@@ -69,6 +71,19 @@ npm run dev
 # —— 或者 生产模式 ——
 npm run build          # 构建前端到 web/dist
 npm start              # 后端在 :8787 同时托管前端，打开 http://localhost:8787
+```
+
+### IDEA 插件（可选）
+
+`idea-plugin/` 是独立的 IntelliJ IDEA 插件模块。导入后可在
+`Settings/Preferences → Tools → LingCe AI File Cleaner` 配置 OpenAI 兼容
+`baseUrl`、`apiKey`、模型、转存目录和清理策略；插件会监听新文件并在项目打开时扫描，
+自动清理临时文件、把项目/AI 配置文件加入 ignore，对可疑文件提供一键转存或删除。
+
+```bash
+cd idea-plugin
+gradle runIde       # 本机安装 Gradle 时可用；也可直接用 IDEA 的 Gradle 面板运行
+gradle buildPlugin
 ```
 
 ### 配置（两种方式任选）

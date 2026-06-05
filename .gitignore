@@ -1,6 +1,8 @@
 node_modules/
+.gradle/
 dist/
 build/
+.ai-cleaner/
 .env
 .env.local
 *.log

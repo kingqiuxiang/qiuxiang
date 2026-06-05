@@ -1,0 +1,24 @@
+<idea-plugin>
+    <id>com.lingce.ai-file-cleaner</id>
+    <name>LingCe AI File Cleaner</name>
+    <vendor email="support@lingce.local">LingCe</vendor>
+
+    <description><![CDATA[
+        Keeps local projects clean by detecting temporary files, AI-generated disposable files,
+        AI/project configuration files, and suspicious unknown files. Supports OpenAI-compatible
+        API endpoints for optional AI-assisted classification.
+    ]]></description>
+
+    <depends>com.intellij.modules.platform</depends>
+
+    <extensions defaultExtensionNs="com.intellij">
+        <applicationService serviceImplementation="com.lingce.cleaner.AiCleanerSettings"/>
+        <projectService serviceImplementation="com.lingce.cleaner.AiCleanerService"/>
+        <postStartupActivity implementation="com.lingce.cleaner.AiCleanerStartupActivity"/>
+        <projectConfigurable
+            parentId="tools"
+            instance="com.lingce.cleaner.AiCleanerConfigurable"
+            displayName="LingCe AI File Cleaner"/>
+        <notificationGroup id="LingCe AI Cleaner" displayType="BALLOON"/>
+    </extensions>
+</idea-plugin>
