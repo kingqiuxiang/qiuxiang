@@ -1,0 +1,61 @@
+<idea-plugin>
+    <id>com.lingce.ai-file-cleaner</id>
+    <name>AI File Cleaner</name>
+    <vendor email="dev@lingce.local" url="https://github.com/">LingCe</vendor>
+
+    <description><![CDATA[
+        <h2>AI 文件清理 (AI File Cleaner)</h2>
+        <p>识别工作区中由 AI 生成的无用文件、临时文件、项目/AI 配置文件与可疑文件，并一键清理，保证本地干净。</p>
+        <ul>
+            <li><b>AI 生成无用文件 / 临时文件</b>：及时删除（可选先转存隔离）。</li>
+            <li><b>项目配置 / AI 配置文件</b>：加入 .gitignore 并在 IDE 中标记 excluded。</li>
+            <li><b>可疑/不可预测文件</b>：一键转存到指定目录或一键删除。</li>
+            <li>支持配置 OpenAI 兼容接口（Base URL / API Key / Model）做二次智能判定。</li>
+            <li>导入/新建文件时自动检测并提示（可选自动清理）。</li>
+        </ul>
+    ]]></description>
+
+    <depends>com.intellij.modules.platform</depends>
+
+    <extensions defaultExtensionNs="com.intellij">
+        <applicationService serviceImplementation="com.lingce.aicleaner.settings.AiCleanerSettings"/>
+
+        <applicationConfigurable
+            parentId="tools"
+            instance="com.lingce.aicleaner.settings.AiCleanerConfigurable"
+            id="com.lingce.aicleaner.settings"
+            displayName="AI 文件清理"/>
+
+        <notificationGroup id="AI File Cleaner" displayType="BALLOON"/>
+
+        <postStartupActivity implementation="com.lingce.aicleaner.listener.ImportWatcher"/>
+    </extensions>
+
+    <actions>
+        <action id="AiCleaner.ScanProject"
+                class="com.lingce.aicleaner.actions.ScanProjectAction"
+                text="AI 文件清理：扫描…"
+                description="扫描项目并清理 AI 生成/临时/可疑文件">
+            <add-to-group group-id="ToolsMenu" anchor="last"/>
+        </action>
+
+        <group id="AiCleaner.PopupGroup" text="AI 文件清理" popup="true">
+            <add-to-group group-id="ProjectViewPopupMenu" anchor="last"/>
+
+            <reference ref="AiCleaner.ScanProject"/>
+            <separator/>
+            <action id="AiCleaner.Quarantine"
+                    class="com.lingce.aicleaner.actions.QuarantineFileAction"
+                    text="转存隔离"
+                    description="把选中文件转存到隔离目录"/>
+            <action id="AiCleaner.Delete"
+                    class="com.lingce.aicleaner.actions.DeleteSuspiciousFileAction"
+                    text="删除"
+                    description="删除选中文件"/>
+            <action id="AiCleaner.IgnoreExclude"
+                    class="com.lingce.aicleaner.actions.IgnoreExcludeFileAction"
+                    text="加入忽略/排除"
+                    description="加入 .gitignore 并标记 excluded"/>
+        </group>
+    </actions>
+</idea-plugin>
