@@ -1,0 +1,112 @@
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>AI 接口联调与自动测试工作台</title>
+    <link rel="stylesheet" href="/styles.css" />
+  </head>
+  <body>
+    <main class="container">
+      <header class="hero">
+        <div>
+          <h1>AI 接口联调与自动测试工作台</h1>
+          <p>
+            读取 YAPI -> AI 一键填参 -> 快速启动项目 -> 自动接口/页面测试
+          </p>
+        </div>
+        <div class="badge">Flowing Interaction</div>
+      </header>
+
+      <section class="card">
+        <h2>1) 导入 YAPI 参数</h2>
+        <div class="grid two">
+          <label>
+            导入类型
+            <select id="yapiSourceType">
+              <option value="json">JSON 文本</option>
+              <option value="url">URL</option>
+              <option value="file">文件路径</option>
+            </select>
+          </label>
+          <label>
+            YAPI 数据
+            <textarea
+              id="yapiValue"
+              placeholder="粘贴 YAPI JSON，或者输入 URL/本地文件路径"
+            ></textarea>
+          </label>
+        </div>
+        <button id="loadYapiBtn">导入 YAPI</button>
+        <div id="interfaceList" class="panel"></div>
+      </section>
+
+      <section class="card">
+        <h2>2) AI 一键填充参数</h2>
+        <div class="grid two">
+          <label>
+            接口 ID
+            <input id="interfaceId" placeholder="从上方接口列表复制 ID" />
+          </label>
+          <label>
+            项目路径
+            <input id="projectPath" value="." />
+          </label>
+        </div>
+        <button id="fillBtn">AI 一键填参</button>
+        <pre id="fillOutput" class="code-block"></pre>
+      </section>
+
+      <section class="card">
+        <h2>3) AI 快速启动并调用项目</h2>
+        <div class="grid two">
+          <label>
+            启动命令
+            <input id="runCommand" placeholder="例如: npm run dev" />
+          </label>
+          <label>
+            启动目录
+            <input id="runCwd" value="." />
+          </label>
+        </div>
+        <button id="runStartBtn">启动项目</button>
+        <pre id="runOutput" class="code-block"></pre>
+      </section>
+
+      <section class="card">
+        <h2>4) 接口完成后自动测试（接口 + 前端页面）</h2>
+        <div class="grid two">
+          <label>
+            前端页面 URL
+            <input id="frontendUrl" placeholder="例如: http://localhost:3000" />
+          </label>
+          <label>
+            期望页面文案（可选）
+            <input id="expectText" placeholder="例如: 登录" />
+          </label>
+          <label>
+            调用 URL
+            <input id="invokeUrl" placeholder="例如: http://localhost:8080/api/login" />
+          </label>
+          <label>
+            调用方法
+            <select id="invokeMethod">
+              <option>GET</option>
+              <option>POST</option>
+              <option>PUT</option>
+              <option>PATCH</option>
+              <option>DELETE</option>
+            </select>
+          </label>
+          <label>
+            调用 Body(JSON)
+            <textarea id="invokeBody" placeholder='{"username":"demo"}'></textarea>
+          </label>
+        </div>
+        <button id="testBtn">执行 AI 自动测试</button>
+        <pre id="testOutput" class="code-block"></pre>
+      </section>
+    </main>
+    <script type="module" src="/app.js"></script>
+  </body>
+</html>
