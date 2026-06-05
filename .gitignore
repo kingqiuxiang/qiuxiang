@@ -11,3 +11,4 @@ web/dist/
 coverage/
 .playwright/
 *.tsbuildinfo
+.idea-ai-cleaner/
