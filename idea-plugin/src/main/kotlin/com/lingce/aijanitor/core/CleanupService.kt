@@ -13,6 +13,8 @@ import com.intellij.openapi.vfs.VirtualFile
 import com.lingce.aijanitor.model.CleanupAction
 import com.lingce.aijanitor.model.ScanItem
 import com.lingce.aijanitor.settings.AiJanitorSettings
+import java.nio.file.Files
+import java.nio.file.Path
 
 /** Executes the chosen [CleanupAction] for a set of files. */
 class CleanupService(private val project: Project) {
@@ -74,9 +76,9 @@ class CleanupService(private val project: Project) {
                 }
             }
 
-            // Make the helper folders git-ignored and IDE-excluded so they stay invisible.
+            // Make the helper folders git-ignored (locally) and IDE-excluded so they stay invisible.
             if (archived > 0 || ignored > 0) {
-                runCatching { ensureGitIgnored(base, listOf(settings.archiveDir, settings.ignoreDir)) }
+                runCatching { excludeFromGit(base, listOf(settings.archiveDir, settings.ignoreDir)) }
                 if (archived > 0) archiveDir?.let { runCatching { markExcluded(it) } }
                 if (ignored > 0) ignoreDir?.let { runCatching { markExcluded(it) } }
             }
@@ -100,15 +102,62 @@ class CleanupService(private val project: Project) {
         file.move(this, targetDir)
     }
 
-    private fun ensureGitIgnored(base: VirtualFile, dirs: List<String>) {
-        val gitignore = base.findChild(".gitignore") ?: base.createChildData(this, ".gitignore")
-        val existing = VfsUtilCore.loadText(gitignore)
-        val lines = existing.lines().map { it.trim() }.toMutableSet()
-        val toAdd = dirs.map { it.replace('\\', '/').trim('/') + "/" }.filter { it !in lines && it.length > 1 }
+    /**
+     * Excludes the helper folders from Git using the repo-local, **untracked**
+     * `.git/info/exclude` file so the tracked `.gitignore` is never touched.
+     * Falls back to `.gitignore` only when the project is not a Git repository.
+     */
+    private fun excludeFromGit(base: VirtualFile, dirs: List<String>) {
+        val entries = dirs.map { it.replace('\\', '/').trim('/') + "/" }.filter { it.length > 1 }.distinct()
+        if (entries.isEmpty()) return
+        val excludeFile = resolveGitInfoExclude(Path.of(base.path))
+        if (excludeFile != null) {
+            appendMissingLines(excludeFile, entries)
+        } else {
+            ensureGitIgnored(base, entries)
+        }
+    }
+
+    /** Resolves `<gitdir>/info/exclude`, handling normal repos and worktrees/submodules (.git file). */
+    private fun resolveGitInfoExclude(base: Path): Path? {
+        val dotGit = base.resolve(".git")
+        val gitDir: Path = when {
+            Files.isDirectory(dotGit) -> dotGit
+            Files.isRegularFile(dotGit) -> {
+                val text = runCatching { Files.readString(dotGit).trim() }.getOrNull() ?: return null
+                val pointer = text.lineSequence().firstOrNull { it.startsWith("gitdir:") }?.substringAfter("gitdir:")?.trim()
+                    ?: return null
+                base.resolve(pointer).normalize()
+            }
+            else -> return null
+        }
+        val info = gitDir.resolve("info")
+        Files.createDirectories(info)
+        return info.resolve("exclude")
+    }
+
+    private fun appendMissingLines(file: Path, entries: List<String>) {
+        val existing = if (Files.exists(file)) Files.readString(file) else ""
+        val present = existing.lines().map { it.trim() }.toSet()
+        val toAdd = entries.filter { it !in present }
         if (toAdd.isEmpty()) return
         val sb = StringBuilder(existing)
         if (existing.isNotEmpty() && !existing.endsWith("\n")) sb.append('\n')
-        sb.append("\n# Added by AI File Janitor\n")
+        if (!existing.contains(MARKER)) sb.append("\n$MARKER\n")
+        toAdd.forEach { sb.append(it).append('\n') }
+        Files.writeString(file, sb.toString())
+    }
+
+    /** Fallback used only when there is no Git repository. */
+    private fun ensureGitIgnored(base: VirtualFile, entries: List<String>) {
+        val gitignore = base.findChild(".gitignore") ?: base.createChildData(this, ".gitignore")
+        val existing = VfsUtilCore.loadText(gitignore)
+        val present = existing.lines().map { it.trim() }.toSet()
+        val toAdd = entries.filter { it !in present }
+        if (toAdd.isEmpty()) return
+        val sb = StringBuilder(existing)
+        if (existing.isNotEmpty() && !existing.endsWith("\n")) sb.append('\n')
+        if (!existing.contains(MARKER)) sb.append("\n$MARKER\n")
         toAdd.forEach { sb.append(it).append('\n') }
         VfsUtil.saveText(gitignore, sb.toString())
     }
@@ -121,5 +170,6 @@ class CleanupService(private val project: Project) {
 
     companion object {
         private val LOG = logger<CleanupService>()
+        private const val MARKER = "# Added by AI File Janitor"
     }
 }
