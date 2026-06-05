@@ -1,0 +1,64 @@
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>AI 接口联调系统</title>
+    <link rel="stylesheet" href="/static/styles.css" />
+  </head>
+  <body>
+    <div class="bg-glow"></div>
+    <main class="container">
+      <header class="hero card">
+        <h1>AI 接口联调系统</h1>
+        <p>读取 YAPI + 结合项目代码，一键填参、启动项目并自动测试接口与页面</p>
+      </header>
+
+      <section class="card">
+        <h2>1) 粘贴 YAPI 导出 JSON</h2>
+        <textarea id="yapiInput" placeholder='{"list":[...]}'></textarea>
+        <div class="actions">
+          <button id="parseBtn">解析接口</button>
+        </div>
+      </section>
+
+      <section class="card">
+        <h2>2) 选择接口并生成参数</h2>
+        <select id="interfaceSelect"></select>
+        <input id="projectRoot" value="." placeholder="项目根目录" />
+        <div class="actions">
+          <button id="fillBtn">AI 一键填充参数</button>
+        </div>
+      </section>
+
+      <section class="card">
+        <h2>3) AI 快捷启动项目（可选）</h2>
+        <div class="grid-2">
+          <input id="projectName" placeholder="项目名，例如 frontend-dev" />
+          <input id="projectCwd" value="." placeholder="启动目录" />
+        </div>
+        <input id="projectCommand" placeholder="启动命令，例如 npm run dev" />
+        <input id="readyKeyword" placeholder="就绪关键字（可空），例如 ready" />
+        <div class="actions">
+          <button id="startBtn">启动项目</button>
+        </div>
+      </section>
+
+      <section class="card">
+        <h2>4) 写完接口后一键测试</h2>
+        <input id="apiBaseUrl" placeholder="API Base URL，例如 http://127.0.0.1:8080" />
+        <input id="uiUrl" placeholder="前端页面 URL（可选），例如 http://127.0.0.1:5173" />
+        <div class="actions">
+          <button id="runWorkflowBtn">执行 AI 测试编排</button>
+        </div>
+      </section>
+
+      <section class="card">
+        <h2>结果</h2>
+        <pre id="output">等待操作...</pre>
+      </section>
+    </main>
+
+    <script src="/static/app.js"></script>
+  </body>
+</html>
