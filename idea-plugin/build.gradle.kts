@@ -1,6 +1,6 @@
 plugins {
     id("java")
-    id("org.jetbrains.intellij") version "1.17.4"
+    id("org.jetbrains.intellij.platform") version "2.2.1"
 }
 
 group = "com.lingce"
@@ -8,25 +8,35 @@ version = "0.1.0"
 
 repositories {
     mavenCentral()
+    intellijPlatform {
+        defaultRepositories()
+    }
+}
+
+dependencies {
+    intellijPlatform {
+        intellijIdeaCommunity("2024.2.5")
+    }
 }
 
 java {
-    toolchain {
-        languageVersion.set(JavaLanguageVersion.of(17))
-    }
+    sourceCompatibility = JavaVersion.VERSION_21
+    targetCompatibility = JavaVersion.VERSION_21
 }
 
-intellij {
-    version.set("2024.2.5")
-    type.set("IC")
+intellijPlatform {
+    pluginConfiguration {
+        name = "LingCe AI File Cleaner"
+        version = project.version.toString()
+
+        ideaVersion {
+            sinceBuild = "242"
+            untilBuild = "253.*"
+        }
+    }
 }
 
 tasks {
-    patchPluginXml {
-        sinceBuild.set("242")
-        untilBuild.set("253.*")
-    }
-
     buildSearchableOptions {
         enabled = false
     }

@@ -28,7 +28,7 @@
 
 - **前端**：React 18 · TypeScript · Vite · TailwindCSS · Framer Motion · Zustand · lucide-react
 - **后端**：Node.js · Express · TypeScript（tsx 运行）· SSE 实时日志
-- **IDE 插件**：IntelliJ Platform Plugin · Java 17（AI 文件清理与 ignore 维护）
+- **IDE 插件**：IntelliJ Platform Plugin · Java 21（AI 文件清理与 ignore 维护）
 - **AI**：任意 OpenAI 兼容接口（OpenAI / DeepSeek / 通义千问 / Moonshot 等）
 - **存储**：本地 JSON 文件（零依赖，免数据库）
 - **浏览器自动化（可选）**：Playwright

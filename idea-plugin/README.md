@@ -4,6 +4,8 @@ IntelliJ IDEA plugin for keeping local projects clean when AI assistants create
 temporary files, disposable generated drafts, IDE/project metadata, or unknown
 suspicious files.
 
+Requires IntelliJ Platform 2024.2+ and Java 21 for local builds.
+
 ## Features
 
 - Scans the project after it opens and watches newly created files.
