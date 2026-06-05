@@ -451,13 +451,18 @@ public class Main {
 
         private static List<Map<String, Object>> extractModels(Path root, Path file, String content) {
             List<Map<String, Object>> models = new ArrayList<>();
-            Matcher javaField = JAVA_FIELD.matcher(content);
-            while (javaField.find() && models.size() < 40) {
-                models.add(model(root, file, javaField.group(2), javaField.group(1), lineNumber(content, javaField.start())));
+            String ext = extension(file.getFileName().toString());
+            if (Set.of(".java", ".kt", ".cs").contains(ext)) {
+                Matcher javaField = JAVA_FIELD.matcher(content);
+                while (javaField.find() && models.size() < 40) {
+                    models.add(model(root, file, javaField.group(2), javaField.group(1), lineNumber(content, javaField.start())));
+                }
             }
-            Matcher tsField = TS_FIELD.matcher(content);
-            while (tsField.find() && models.size() < 80) {
-                models.add(model(root, file, tsField.group(1), tsField.group(2), lineNumber(content, tsField.start())));
+            if (Set.of(".ts", ".tsx", ".vue").contains(ext)) {
+                Matcher tsField = TS_FIELD.matcher(content);
+                while (tsField.find() && models.size() < 80) {
+                    models.add(model(root, file, tsField.group(1), tsField.group(2), lineNumber(content, tsField.start())));
+                }
             }
             return models;
         }
