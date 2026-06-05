@@ -1,0 +1,12 @@
+{
+  "_说明": "复制到 .cursor/mcp.json（项目级）或 %USERPROFILE%\\.cursor\\mcp.json（全局）。把 args 改成你本机 xmind-mcp/src/index.js 的绝对路径；Windows 反斜杠写成 \\\\。XMIND_PATH 可选，自动打开失败时再设置。",
+  "mcpServers": {
+    "xmind": {
+      "command": "node",
+      "args": ["C:\\换成你本机的绝对路径\\xmind-mcp\\src\\index.js"],
+      "env": {
+        "XMIND_PATH": "C:\\Users\\你的用户名\\AppData\\Local\\Programs\\XMind\\XMind.exe"
+      }
+    }
+  }
+}

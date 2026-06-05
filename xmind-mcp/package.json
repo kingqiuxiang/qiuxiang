@@ -1,0 +1,23 @@
+{
+  "name": "xmind-mcp",
+  "version": "1.0.0",
+  "private": true,
+  "description": "MCP 服务：让 Cursor 根据需求生成思维导图并用本地 XMind 打开（Windows 优先，跨平台可用）",
+  "type": "module",
+  "bin": {
+    "xmind-mcp": "src/index.js"
+  },
+  "main": "src/index.js",
+  "scripts": {
+    "start": "node src/index.js",
+    "smoke": "node test/smoke.js"
+  },
+  "engines": {
+    "node": ">=18"
+  },
+  "dependencies": {
+    "@modelcontextprotocol/sdk": "^1.12.1",
+    "jszip": "^3.10.1",
+    "zod": "^3.23.8"
+  }
+}
