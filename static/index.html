@@ -1,0 +1,157 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>AI YAPI Dev Assistant</title>
+  <link rel="stylesheet" href="/static/app.css">
+</head>
+<body>
+  <div class="aurora aurora-one"></div>
+  <div class="aurora aurora-two"></div>
+
+  <main class="shell">
+    <section class="hero glass">
+      <div>
+        <p class="eyebrow">AI 接口研发工作台</p>
+        <h1>读取 YAPI 和项目代码，一键生成参数并测试接口</h1>
+        <p class="subtitle">
+          导入接口定义、扫描项目实现、AI 自动补齐请求参数、启动本地项目，并对前端页面和接口进行快速验证。
+        </p>
+        <div class="actions">
+          <button class="primary" id="runPipeline">一键执行推荐流程</button>
+          <button class="ghost" id="healthCheck">检查服务状态</button>
+        </div>
+      </div>
+      <div class="hero-card">
+        <span class="pulse"></span>
+        <strong id="serviceState">待连接</strong>
+        <small>Java 零依赖本地服务</small>
+      </div>
+    </section>
+
+    <section class="grid">
+      <article class="panel glass step-card" data-step="1">
+        <div class="step-head">
+          <span>01</span>
+          <div>
+            <h2>YAPI 接口读取</h2>
+            <p>支持 interfaceId 或 projectId，自动规整参数、请求体和响应结构。</p>
+          </div>
+        </div>
+        <label>YAPI 地址
+          <input id="yapiBaseUrl" placeholder="https://yapi.example.com">
+        </label>
+        <div class="two">
+          <label>接口 ID
+            <input id="interfaceId" placeholder="1234">
+          </label>
+          <label>项目 ID
+            <input id="projectId" placeholder="可选">
+          </label>
+        </div>
+        <label>Token
+          <input id="yapiToken" placeholder="可选，私有项目填写 token">
+        </label>
+        <button id="importYapi">读取 YAPI</button>
+      </article>
+
+      <article class="panel glass step-card" data-step="2">
+        <div class="step-head">
+          <span>02</span>
+          <div>
+            <h2>项目代码扫描</h2>
+            <p>识别路由、HTTP 调用、测试框架和关键工程信号，作为 AI 填参上下文。</p>
+          </div>
+        </div>
+        <div class="two">
+          <label>扫描目录
+            <input id="scanRoot" value=".">
+          </label>
+          <label>最大文件数
+            <input id="maxFiles" type="number" value="350">
+          </label>
+        </div>
+        <button id="scanProject">扫描项目</button>
+      </article>
+
+      <article class="panel glass step-card wide" data-step="3">
+        <div class="step-head">
+          <span>03</span>
+          <div>
+            <h2>AI 一键参数填充</h2>
+            <p>配置 AI_API_KEY 后使用大模型；未配置时使用本地规则生成可测试参数。</p>
+          </div>
+        </div>
+        <textarea id="extraPrompt" rows="3" placeholder="可补充业务约束，例如：使用测试租户、手机号必须通过白名单、状态取 enabled"></textarea>
+        <button id="fillParams">AI 一键填参</button>
+      </article>
+
+      <article class="panel glass step-card" data-step="4">
+        <div class="step-head">
+          <span>04</span>
+          <div>
+            <h2>快捷启动项目</h2>
+            <p>输入本地启动命令，系统会托管进程并展示日志，便于 AI 随后调用测试。</p>
+          </div>
+        </div>
+        <label>启动命令
+          <input id="startCommand" placeholder="例如：npm run dev 或 mvn spring-boot:run">
+        </label>
+        <label>工作目录
+          <input id="commandCwd" value=".">
+        </label>
+        <div class="actions compact">
+          <button id="startProject">启动</button>
+          <button class="ghost" id="refreshProcesses">刷新进程</button>
+        </div>
+      </article>
+
+      <article class="panel glass step-card" data-step="5">
+        <div class="step-head">
+          <span>05</span>
+          <div>
+            <h2>页面与接口测试</h2>
+            <p>访问开发环境前端页面，或使用 AI 填好的参数直接调用接口。</p>
+          </div>
+        </div>
+        <label>前端页面 URL
+          <input id="pageUrl" placeholder="http://localhost:5173">
+        </label>
+        <button id="inspectPage">检查页面</button>
+        <label>接口 Base URL
+          <input id="apiBaseUrl" placeholder="http://localhost:8080">
+        </label>
+        <button class="primary" id="testApi">调用接口测试</button>
+      </article>
+    </section>
+
+    <section class="workspace">
+      <article class="glass output">
+        <div class="output-head">
+          <h2>运行结果</h2>
+          <div class="tabs">
+            <button class="tab active" data-tab="summary">摘要</button>
+            <button class="tab" data-tab="yapi">YAPI</button>
+            <button class="tab" data-tab="project">项目</button>
+            <button class="tab" data-tab="fill">参数</button>
+            <button class="tab" data-tab="test">测试</button>
+            <button class="tab" data-tab="logs">日志</button>
+          </div>
+        </div>
+        <pre id="output">{ "ready": true }</pre>
+      </article>
+
+      <aside class="glass timeline">
+        <h2>AI 工作流</h2>
+        <ol id="timeline">
+          <li>等待开始</li>
+        </ol>
+      </aside>
+    </section>
+  </main>
+
+  <div class="toast" id="toast"></div>
+  <script src="/static/app.js"></script>
+</body>
+</html>
