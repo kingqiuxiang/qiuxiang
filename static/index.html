@@ -1,0 +1,212 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>AI 接口联测助手</title>
+  <style>
+    :root {
+      --bg: #0b1020;
+      --card: rgba(255, 255, 255, 0.08);
+      --line: rgba(255, 255, 255, 0.15);
+      --text: #ecf0ff;
+      --muted: #a9b2d3;
+      --accent: #7c8cff;
+      --ok: #36d399;
+    }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      font-family: Inter, "PingFang SC", "Microsoft YaHei", sans-serif;
+      color: var(--text);
+      background: radial-gradient(circle at 10% 20%, #243b81, var(--bg) 35%);
+      min-height: 100vh;
+    }
+    .wrap { max-width: 1100px; margin: 0 auto; padding: 24px; }
+    .header { margin-bottom: 16px; }
+    .header h1 { margin: 0; font-size: 30px; }
+    .header p { color: var(--muted); margin-top: 8px; }
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+      gap: 16px;
+    }
+    .card {
+      background: var(--card);
+      border: 1px solid var(--line);
+      border-radius: 16px;
+      padding: 16px;
+      backdrop-filter: blur(12px);
+    }
+    label { display: block; font-size: 13px; margin-bottom: 6px; color: var(--muted); }
+    input, textarea, select, button {
+      width: 100%;
+      border-radius: 10px;
+      border: 1px solid var(--line);
+      background: rgba(0, 0, 0, 0.2);
+      color: var(--text);
+      padding: 10px 12px;
+      margin-bottom: 10px;
+    }
+    textarea { min-height: 90px; resize: vertical; }
+    button {
+      background: linear-gradient(90deg, #697aff, #8e5bff);
+      cursor: pointer;
+      transition: transform .15s ease, opacity .2s ease;
+      border: 0;
+    }
+    button:hover { transform: translateY(-1px); }
+    button.secondary { background: rgba(255,255,255,.12); border: 1px solid var(--line); }
+    .status { padding: 10px; border-radius: 10px; border: 1px solid var(--line); font-size: 13px; }
+    .ok { color: var(--ok); }
+    pre {
+      white-space: pre-wrap;
+      word-break: break-word;
+      border: 1px solid var(--line);
+      border-radius: 10px;
+      padding: 12px;
+      max-height: 280px;
+      overflow: auto;
+      background: rgba(10, 14, 28, 0.6);
+    }
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <div class="header">
+      <h1>AI 接口联测助手</h1>
+      <p>YAPI 导入 -> AI 一键填参与代码对齐 -> 启动项目 -> 接口 + 前端联测</p>
+    </div>
+    <div class="grid">
+      <section class="card">
+        <h3>1) 导入 YAPI</h3>
+        <label>YAPI JSON 文件路径（或 URL）</label>
+        <input id="yapiSource" placeholder="例如 /workspace/yapi-export.json 或 https://..." />
+        <label><input type="checkbox" id="isUrl" style="width:auto;"> 按 URL 读取</label>
+        <button onclick="importYapi()">导入接口</button>
+        <label>选择接口</label>
+        <select id="endpointSelect"></select>
+        <div id="importStatus" class="status">等待导入</div>
+      </section>
+
+      <section class="card">
+        <h3>2) AI 一键填参</h3>
+        <label>项目根目录</label>
+        <input id="projectRoot" value="." />
+        <label>额外提示词</label>
+        <textarea id="extraPrompt" placeholder="比如：token 使用测试账号"></textarea>
+        <button onclick="autofill()">一键填充参数</button>
+        <pre id="autofillResult">{}</pre>
+      </section>
+
+      <section class="card">
+        <h3>3) AI 快捷启动项目</h3>
+        <label>启动命令</label>
+        <input id="startCommand" placeholder="例如 npm run dev / mvn spring-boot:run / python app.py" />
+        <label>工作目录</label>
+        <input id="startCwd" value="." />
+        <button onclick="quickStart()">启动项目</button>
+        <button class="secondary" onclick="checkStatus()">刷新状态</button>
+        <div id="processStatus" class="status">未启动</div>
+      </section>
+
+      <section class="card">
+        <h3>4) 写完接口后联测</h3>
+        <label>后端 Base URL</label>
+        <input id="baseUrl" placeholder="http://127.0.0.1:8080" />
+        <label>前端页面 URL（可选）</label>
+        <input id="frontendUrl" placeholder="http://127.0.0.1:5173" />
+        <button onclick="runTests()">执行接口 + 前端联测</button>
+        <pre id="testResult">{}</pre>
+      </section>
+    </div>
+  </div>
+
+  <script>
+    let endpoints = [];
+    let selectedEndpoint = null;
+    let lastFilled = { query: {}, path: {}, body: {} };
+
+    function json(v) { return JSON.stringify(v, null, 2); }
+
+    async function post(url, payload) {
+      const res = await fetch(url, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(payload),
+      });
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.detail || "请求失败");
+      return data;
+    }
+
+    async function importYapi() {
+      const source = document.getElementById("yapiSource").value.trim();
+      const isUrl = document.getElementById("isUrl").checked;
+      const status = document.getElementById("importStatus");
+      try {
+        const data = await post("/api/yapi/import", { source, is_url: isUrl });
+        endpoints = data.endpoints || [];
+        const select = document.getElementById("endpointSelect");
+        select.innerHTML = "";
+        endpoints.forEach((ep, idx) => {
+          const opt = document.createElement("option");
+          opt.value = String(idx);
+          opt.textContent = `[${ep.method}] ${ep.path}`;
+          select.appendChild(opt);
+        });
+        selectedEndpoint = endpoints[0] || null;
+        status.innerHTML = `<span class="ok">已导入 ${endpoints.length} 个接口</span>`;
+      } catch (e) {
+        status.textContent = e.message;
+      }
+    }
+
+    document.getElementById("endpointSelect").addEventListener("change", (e) => {
+      const idx = Number(e.target.value);
+      selectedEndpoint = endpoints[idx] || null;
+    });
+
+    async function autofill() {
+      if (!selectedEndpoint) return;
+      const projectRoot = document.getElementById("projectRoot").value.trim() || ".";
+      const extraPrompt = document.getElementById("extraPrompt").value.trim();
+      const data = await post("/api/params/autofill", {
+        endpoint: selectedEndpoint,
+        project_root: projectRoot,
+        extra_prompt: extraPrompt,
+      });
+      lastFilled = data;
+      document.getElementById("autofillResult").textContent = json(data);
+    }
+
+    async function quickStart() {
+      const command = document.getElementById("startCommand").value.trim();
+      const cwd = document.getElementById("startCwd").value.trim() || ".";
+      const data = await post("/api/project/quick-start", { command, cwd });
+      document.getElementById("processStatus").textContent = `已启动 PID=${data.pid} | ${data.command}`;
+    }
+
+    async function checkStatus() {
+      const res = await fetch("/api/project/status");
+      const data = await res.json();
+      document.getElementById("processStatus").textContent = json(data);
+    }
+
+    async function runTests() {
+      if (!selectedEndpoint) return;
+      const baseUrl = document.getElementById("baseUrl").value.trim();
+      const frontendUrl = document.getElementById("frontendUrl").value.trim();
+      const data = await post("/api/tests/run", {
+        base_url: baseUrl,
+        endpoint: selectedEndpoint,
+        query: lastFilled.query || {},
+        path: lastFilled.path || {},
+        body: lastFilled.body || {},
+        frontend_url: frontendUrl || null
+      });
+      document.getElementById("testResult").textContent = json(data);
+    }
+  </script>
+</body>
+</html>
