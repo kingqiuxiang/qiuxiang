@@ -13,3 +13,4 @@ coverage/
 *.tsbuildinfo
 .gradle/
 idea-plugin/build/
+idea-plugin/.intellijPlatform/
