@@ -1,0 +1,29 @@
+<idea-plugin>
+    <id>io.lingce.ai-file-guardian</id>
+    <name>AI File Guardian Cleaner</name>
+    <vendor email="support@lingce.local">LingCe</vendor>
+
+    <description><![CDATA[
+      识别 AI 生成/临时/可疑文件，并支持快速清理、转存以及 ignore/exclude 管理。
+    ]]></description>
+
+    <depends>com.intellij.modules.platform</depends>
+
+    <extensions defaultExtensionNs="com.intellij">
+        <notificationGroup id="AI File Guardian" displayType="BALLOON" isLogByDefault="true"/>
+        <applicationConfigurable
+                id="io.lingce.ideaguardian.settings"
+                parentId="tools"
+                displayName="AI File Guardian"
+                instance="io.lingce.ideaguardian.settings.AiFileGuardianConfigurable"/>
+    </extensions>
+
+    <actions>
+        <action id="io.lingce.ideaguardian.ScanAndCleanAction"
+                class="io.lingce.ideaguardian.actions.ScanAndCleanAction"
+                text="AI File Guardian: Scan &amp; Clean"
+                description="扫描并清理 AI 生成、临时和可疑文件">
+            <add-to-group group-id="ToolsMenu" anchor="last"/>
+        </action>
+    </actions>
+</idea-plugin>
