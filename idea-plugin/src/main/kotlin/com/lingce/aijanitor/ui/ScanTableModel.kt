@@ -1,6 +1,7 @@
 package com.lingce.aijanitor.ui
 
 import com.lingce.aijanitor.model.CleanupAction
+import com.lingce.aijanitor.model.FileCategory
 import com.lingce.aijanitor.model.ScanItem
 import javax.swing.table.AbstractTableModel
 
@@ -38,8 +39,10 @@ class ScanTableModel : AbstractTableModel() {
     }
 
     /** Select / deselect the currently visible (filtered) rows. */
-    fun setAllSelected(selected: Boolean) {
-        displayedRows.forEach { it.selected = selected }
+    fun selectVisibleRows(flag: Boolean) {
+        for (item in displayedRows) {
+            item.selected = flag
+        }
         fireTableDataChanged()
     }
 
@@ -55,6 +58,7 @@ class ScanTableModel : AbstractTableModel() {
 
     override fun getColumnClass(columnIndex: Int): Class<*> = when (columnIndex) {
         0 -> java.lang.Boolean::class.java
+        2 -> FileCategory::class.java
         3 -> CleanupAction::class.java
         else -> String::class.java
     }
@@ -66,7 +70,7 @@ class ScanTableModel : AbstractTableModel() {
         return when (columnIndex) {
             0 -> item.selected
             1 -> item.relativePath
-            2 -> item.category.display
+            2 -> item.category
             3 -> item.action
             4 -> item.reason
             else -> ""
