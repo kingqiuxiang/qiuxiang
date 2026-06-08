@@ -52,11 +52,12 @@ class JanitorController(private val project: Project) {
                 if (settings.aiConfigured() && result.items.isNotEmpty()) {
                     indicator.text = "调用 AI 进行智能识别…"
                     val client = AiClient(settings.state.baseUrl, settings.apiKey, settings.state.model)
-                    AiClassifier(client, settings.state.aiBatchSize).refine(result.items, result.snippets, indicator)
+                    val aiKeepPatterns = settings.state.aiKeepPatterns.split(',').map { it.trim() }.filter { it.isNotEmpty() }
+                    AiClassifier(client, settings.state.aiBatchSize, aiKeepPatterns).refine(result.items, result.snippets, indicator)
                 }
-                val actionable = result.items.filter { it.category.name != "NORMAL" }
-                items = actionable
-                val msg = "扫描完成：共 ${result.scannedCount} 个文件，发现 ${actionable.size} 个待处理。"
+                items = result.items
+                val actionableCount = result.items.count { it.category.name != "NORMAL" }
+                val msg = "扫描完成：共 ${result.scannedCount} 个文件，发现 $actionableCount 个待处理。"
                 notifyListeners(msg)
             }
 
@@ -71,7 +72,7 @@ class JanitorController(private val project: Project) {
         }.queue()
     }
 
-    /** Applies the given items' actions; removes processed items from the list. */
+    /** Applies the given items' actions; removes processed items from the list, then refreshes. */
     fun applyItems(toApply: List<ScanItem>) {
         if (toApply.isEmpty()) return
         ApplicationManager.getApplication().invokeLater {
@@ -80,6 +81,65 @@ class JanitorController(private val project: Project) {
             items = items.filterNot { it in processed && report.errors.none { e -> e.startsWith(it.relativePath) } }
             notify(report.summary(), if (report.errors.isEmpty()) NotificationType.INFORMATION else NotificationType.WARNING)
             notifyListeners(report.summary())
+            // Auto-refresh after apply so the user sees the latest state.
+            if (processed.isNotEmpty()) {
+                scan()
+            }
+        }
+    }
+
+    /** Calls AI to analyze a single file and returns a user-facing confirmation string. */
+    fun analyzeSingleFile(item: ScanItem, snippet: String, callback: (String) -> Unit) {
+        val settings = AiJanitorSettings.getInstance()
+        if (!settings.aiConfigured()) {
+            callback("AI 未配置，请先在设置中填写 API Key 和 Base URL。")
+            return
+        }
+        object : Task.Backgroundable(project, "AI 分析文件：${item.file.name}", false) {
+            override fun run(indicator: ProgressIndicator) {
+                indicator.isIndeterminate = true
+                indicator.text = "正在调用 AI 分析 ${item.relativePath}…"
+                try {
+                    val client = AiClient(settings.state.baseUrl, settings.apiKey, settings.state.model)
+                    val systemPrompt = """
+                        你是一个代码仓库清理专家。分析给定文件，判断它是否可以安全删除。
+                        返回一个 JSON 对象，格式：
+                        {"canDelete": <true|false>, "purpose": "<文件用途，不超过50字>", "suggestion": "<建议操作：保留/删除/转存/移入git排除，不超过30字>", "risk": "<风险说明，不超过50字>"}
+                        只返回 JSON，不要额外文字。
+                    """.trimIndent()
+                    val userPrompt = "文件路径: ${item.relativePath}\n当前分类: ${item.category.display}\n原因: ${item.reason}\n内容片段:\n```\n${snippet.take(1200)}\n```"
+                    val content = client.chat(systemPrompt, userPrompt)
+                    val json = extractJsonObject(content)
+                    if (json != null) {
+                        val purpose = json.get("purpose")?.asString ?: "未知"
+                        val suggestion = json.get("suggestion")?.asString ?: "无法判断"
+                        val risk = json.get("risk")?.asString ?: "无"
+                        val canDelete = json.get("canDelete")?.asBoolean ?: false
+                        val sb = StringBuilder()
+                        sb.appendLine("📄 文件：${item.relativePath}")
+                        sb.appendLine("📋 用途：$purpose")
+                        sb.appendLine("💡 建议：$suggestion")
+                        sb.appendLine("⚠️ 风险：$risk")
+                        sb.appendLine("🔍 可安全删除：${if (canDelete) "✅ 是" else "❌ 否"}")
+                        callback(sb.toString())
+                    } else {
+                        callback("AI 返回结果解析失败，原始内容：\n${content.take(500)}")
+                    }
+                } catch (e: Exception) {
+                    callback("AI 分析失败：${e.message}")
+                }
+            }
+        }.queue()
+    }
+
+    private fun extractJsonObject(content: String): com.google.gson.JsonObject? {
+        val start = content.indexOf('{')
+        val end = content.lastIndexOf('}')
+        if (start < 0 || end <= start) return null
+        return try {
+            com.google.gson.JsonParser.parseString(content.substring(start, end + 1)).asJsonObject
+        } catch (_: Exception) {
+            null
         }
     }
 
