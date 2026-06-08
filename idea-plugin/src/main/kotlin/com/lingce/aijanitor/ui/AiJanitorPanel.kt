@@ -113,6 +113,7 @@ class AiJanitorPanel(private val project: Project) : JPanel(BorderLayout()) {
         bar.isOpaque = false
 
         bar.add(pill("扫描项目", PillButton.Style.PRIMARY) { controller.scan() })
+        bar.add(pill("AI 深度清理", PillButton.Style.DANGER) { confirmAndDeepScan() })
 
         filterField.emptyText.text = "关键词筛选…"
         filterField.putClientProperty("JTextField.variant", "search")
@@ -137,6 +138,19 @@ class AiJanitorPanel(private val project: Project) : JPanel(BorderLayout()) {
             ShowSettingsUtil.getInstance().showSettingsDialog(project, AiJanitorConfigurable::class.java)
         })
         return bar
+    }
+
+    private fun confirmAndDeepScan() {
+        val ok = Messages.showYesNoDialog(
+            project,
+            "AI 深度清理会分析所有文件（无论是否已提交），找出临时文件和在项目中找不到引用的孤立文件，" +
+                "只展示建议清理的结果（建议保留的不展示）。是否开始分析？",
+            "AI 深度清理",
+            "开始分析",
+            "取消",
+            Messages.getQuestionIcon(),
+        )
+        if (ok == Messages.YES) controller.deepScan()
     }
 
     /** Creates a pill button whose action lambda runs in this panel's scope. */

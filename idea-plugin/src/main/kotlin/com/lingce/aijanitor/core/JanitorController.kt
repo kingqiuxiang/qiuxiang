@@ -26,6 +26,9 @@ class JanitorController(private val project: Project) {
     var scanning: Boolean = false
         private set
 
+    @Volatile
+    private var lastDeep: Boolean = false
+
     private val listeners = CopyOnWriteArrayList<Listener>()
 
     fun addListener(listener: Listener) { listeners.add(listener) }
@@ -42,6 +45,7 @@ class JanitorController(private val project: Project) {
     fun scan() {
         if (scanning) return
         scanning = true
+        lastDeep = false
         notifyListeners("正在扫描…")
         object : Task.Backgroundable(project, "AI 文件清理：扫描项目", true) {
             override fun run(indicator: ProgressIndicator) {
@@ -72,6 +76,36 @@ class JanitorController(private val project: Project) {
         }.queue()
     }
 
+    /**
+     * Runs an AI deep clean: inspects every file (tracked or not), and surfaces
+     * only temp files and unreferenced "orphan" files worth removing.
+     */
+    fun deepScan() {
+        if (scanning) return
+        scanning = true
+        lastDeep = true
+        notifyListeners("正在进行 AI 深度清理分析…")
+        object : Task.Backgroundable(project, "AI 深度清理：分析引用关系", true) {
+            override fun run(indicator: ProgressIndicator) {
+                indicator.isIndeterminate = true
+                indicator.text = "深度扫描项目文件并分析引用关系…"
+                val result = DeepCleanAnalyzer(project).analyze(indicator)
+                items = result.items
+                val msg = "深度清理完成：共分析 ${result.scannedCount} 个文件，发现 ${result.items.size} 个可清理（临时/孤立）。"
+                notifyListeners(msg)
+            }
+
+            override fun onFinished() {
+                scanning = false
+            }
+
+            override fun onThrowable(error: Throwable) {
+                scanning = false
+                notifyListeners("深度清理失败：${error.message}")
+            }
+        }.queue()
+    }
+
     /** Applies the given items' actions; removes processed items from the list, then refreshes. */
     fun applyItems(toApply: List<ScanItem>) {
         if (toApply.isEmpty()) return
@@ -83,7 +117,7 @@ class JanitorController(private val project: Project) {
             notifyListeners(report.summary())
             // Auto-refresh after apply so the user sees the latest state.
             if (processed.isNotEmpty()) {
-                scan()
+                if (lastDeep) deepScan() else scan()
             }
         }
     }
