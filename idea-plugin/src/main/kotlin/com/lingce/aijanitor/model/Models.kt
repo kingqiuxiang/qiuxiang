@@ -17,7 +17,7 @@ enum class CleanupAction(val display: String) {
     KEEP("保留"),
     DELETE("删除"),
     ARCHIVE("转存到目录"),
-    IGNORE("移入 ignore/exclude");
+    IGNORE("移入 .git/info/exclude");
 }
 
 /** Result of classifying a single file. */

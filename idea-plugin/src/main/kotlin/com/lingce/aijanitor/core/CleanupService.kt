@@ -19,12 +19,12 @@ import java.nio.file.Path
 /** Executes the chosen [CleanupAction] for a set of files. */
 class CleanupService(private val project: Project) {
 
-    data class Report(val deleted: Int, val archived: Int, val ignored: Int, val errors: List<String>) {
+    data class Report(val deleted: Int, val archived: Int, val gitExcluded: Int, val errors: List<String>) {
         fun summary(): String {
             val parts = buildList {
                 if (deleted > 0) add("删除 $deleted")
                 if (archived > 0) add("转存 $archived")
-                if (ignored > 0) add("移入 ignore $ignored")
+                if (gitExcluded > 0) add("移入 .git/info/exclude $gitExcluded")
             }
             val head = if (parts.isEmpty()) "未执行任何操作" else parts.joinToString("，")
             return if (errors.isEmpty()) "$head。" else "$head；${errors.size} 个失败。"
@@ -35,16 +35,18 @@ class CleanupService(private val project: Project) {
     fun apply(items: List<ScanItem>): Report {
         var deleted = 0
         var archived = 0
-        var ignored = 0
+        var gitExcluded = 0
         val errors = ArrayList<String>()
 
         val settings = AiJanitorSettings.getInstance().state
         val base = project.guessProjectDir()
             ?: return Report(0, 0, 0, listOf("找不到项目根目录"))
 
+        // Collect files to add to .git/info/exclude (applied after the write action).
+        val gitExcludePaths = ArrayList<String>()
+
         WriteCommandAction.runWriteCommandAction(project, "AI 文件清理", null, {
             val archiveDir by lazy { VfsUtil.createDirectoryIfMissing(base, settings.archiveDir) }
-            val ignoreDir by lazy { VfsUtil.createDirectoryIfMissing(base, settings.ignoreDir) }
 
             for (item in items) {
                 val file = item.file
@@ -64,9 +66,11 @@ class CleanupService(private val project: Project) {
                             archived++
                         }
                         CleanupAction.IGNORE -> {
-                            val target = ignoreDir ?: error("无法创建 ignore 目录")
-                            moveInto(file, target)
-                            ignored++
+                            // Only add if not already covered by an existing exclude pattern
+                            if (!isAlreadyExcluded(item.relativePath, Path.of(base.path))) {
+                                gitExcludePaths.add(item.relativePath)
+                            }
+                            gitExcluded++
                         }
                         CleanupAction.KEEP -> {}
                     }
@@ -76,15 +80,43 @@ class CleanupService(private val project: Project) {
                 }
             }
 
-            // Make the helper folders git-ignored (locally) and IDE-excluded so they stay invisible.
-            if (archived > 0 || ignored > 0) {
-                runCatching { excludeFromGit(base, listOf(settings.archiveDir, settings.ignoreDir)) }
-                if (archived > 0) archiveDir?.let { runCatching { markExcluded(it) } }
-                if (ignored > 0) ignoreDir?.let { runCatching { markExcluded(it) } }
+            // Write the git exclude entries for IGNORE actions.
+            if (gitExcludePaths.isNotEmpty()) {
+                runCatching {
+                    val basePath = Path.of(base.path)
+                    val excludeFile = resolveGitInfoExclude(basePath)
+                    // Consolidate individual paths into folder patterns where possible.
+                    val consolidated = consolidateToFolderPatterns(gitExcludePaths)
+                    if (excludeFile != null) {
+                        appendMissingLines(excludeFile, consolidated)
+                    } else {
+                        // Fallback: add to .gitignore
+                        ensureGitIgnored(base, consolidated)
+                    }
+                }.onFailure { e ->
+                    LOG.warn("写入 git exclude 失败", e)
+                    errors.add("写入 .git/info/exclude 失败: ${e.message}")
+                }
+            }
+
+            // Make archive folder git-ignored and IDE-excluded.
+            if (archived > 0) {
+                runCatching { excludeFromGit(base, listOf(settings.archiveDir)) }
+                archiveDir?.let { runCatching { markExcluded(it) } }
+            }
+
+            // Also re-exclude the old ignoreDir if it exists on disk (for backward compat).
+            val ignoreDirPath = settings.ignoreDir
+            if (ignoreDirPath.isNotBlank()) {
+                val ignoreDir = base.findChild(ignoreDirPath)
+                if (ignoreDir != null) {
+                    runCatching { excludeFromGit(base, listOf(ignoreDirPath)) }
+                    runCatching { markExcluded(ignoreDir) }
+                }
             }
         })
 
-        return Report(deleted, archived, ignored, errors)
+        return Report(deleted, archived, gitExcluded, errors)
     }
 
     private fun moveInto(file: VirtualFile, targetDir: VirtualFile) {
@@ -103,9 +135,8 @@ class CleanupService(private val project: Project) {
     }
 
     /**
-     * Excludes the helper folders from Git using the repo-local, **untracked**
-     * `.git/info/exclude` file so the tracked `.gitignore` is never touched.
-     * Falls back to `.gitignore` only when the project is not a Git repository.
+     * Excludes helper folder patterns from Git using `.git/info/exclude`.
+     * Falls back to `.gitignore` when the project is not a Git repository.
      */
     private fun excludeFromGit(base: VirtualFile, dirs: List<String>) {
         val entries = dirs.map { it.replace('\\', '/').trim('/') + "/" }.filter { it.length > 1 }.distinct()
@@ -116,6 +147,79 @@ class CleanupService(private val project: Project) {
         } else {
             ensureGitIgnored(base, entries)
         }
+    }
+
+    /**
+     * Checks whether [relativePath] is already covered by an existing pattern
+     * in .git/info/exclude (including directory patterns that cover parent dirs).
+     */
+    private fun isAlreadyExcluded(relativePath: String, base: Path): Boolean {
+        val normalized = relativePath.replace('\\', '/')
+        val patterns = readExistingExcludePatterns(base)
+        var excluded = false
+        for (p in patterns) {
+            if (p.regex.matches(normalized)) {
+                excluded = !p.negated
+            }
+            // Also check if a dir-only pattern covers a parent directory
+            if (p.dirOnly) {
+                val parent = normalized.substringBeforeLast('/', "")
+                if (parent.isNotEmpty() && p.regex.matches(parent)) {
+                    excluded = !p.negated
+                }
+            }
+        }
+        return excluded
+    }
+
+    /** Simple pattern holder for existing exclude entries. */
+    private data class ExistingPattern(val raw: String, val negated: Boolean, val dirOnly: Boolean, val regex: Regex)
+
+    private fun readExistingExcludePatterns(base: Path): List<ExistingPattern> {
+        val excludeFile = resolveGitInfoExclude(base) ?: return emptyList()
+        if (!Files.isRegularFile(excludeFile)) return emptyList()
+        val lines = runCatching { Files.readString(excludeFile) }.getOrNull() ?: return emptyList()
+        return lines.lineSequence()
+            .map { it.trim() }
+            .filter { it.isNotEmpty() && !it.startsWith("#") }
+            .mapNotNull { parseExcludePattern(it) }
+            .toList()
+    }
+
+    private fun parseExcludePattern(raw: String): ExistingPattern? {
+        var pat = raw
+        val negated = pat.startsWith("!")
+        if (negated) pat = pat.substring(1)
+        val dirOnly = pat.endsWith("/")
+        if (dirOnly) pat = pat.dropLast(1)
+        if (pat.isEmpty()) return null
+        val anchored = pat.startsWith("/")
+        if (anchored) pat = pat.substring(1)
+        val regexStr = gitignoreGlobToRegex(pat)
+        if (regexStr.isBlank()) return null
+        val finalRegex = if (anchored) Regex("^$regexStr$") else Regex("(^|.*/)$regexStr$")
+        return ExistingPattern(raw, negated, dirOnly, finalRegex)
+    }
+
+    private fun gitignoreGlobToRegex(glob: String): String {
+        val sb = StringBuilder()
+        var i = 0
+        while (i < glob.length) {
+            when (val c = glob[i]) {
+                '*' -> {
+                    when {
+                        i + 2 < glob.length && glob[i + 1] == '*' && glob[i + 2] == '/' -> { sb.append("(.*/)?"); i += 3 }
+                        i + 1 < glob.length && glob[i + 1] == '*' && i + 2 == glob.length -> { sb.append(".*"); i += 2 }
+                        i + 1 < glob.length && glob[i + 1] == '*' -> { sb.append(".*"); i += 2 }
+                        else -> { sb.append("[^/]*"); i++ }
+                    }
+                }
+                '?' -> { sb.append("[^/]"); i++ }
+                '.' -> { sb.append("\\."); i++ }
+                else -> { sb.append(Regex.escape(c.toString())); i++ }
+            }
+        }
+        return sb.toString()
     }
 
     /** Resolves `<gitdir>/info/exclude`, handling normal repos and worktrees/submodules (.git file). */
@@ -160,6 +264,42 @@ class CleanupService(private val project: Project) {
         if (!existing.contains(MARKER)) sb.append("\n$MARKER\n")
         toAdd.forEach { sb.append(it).append('\n') }
         VfsUtil.saveText(gitignore, sb.toString())
+    }
+
+    /**
+     * Consolidates individual file paths into folder-level patterns when a directory
+     * has 3 or more files being excluded. Uses gitignore-style format:
+     * - `/dirname/` for top-level directories (anchored, dir-only match)
+     * - Falls back to individual paths for files in directories below threshold.
+     */
+    private fun consolidateToFolderPatterns(paths: List<String>): List<String> {
+        val normalized = paths.map { it.replace('\\', '/').trimStart('/') }
+        // Group by top-level directory
+        val grouped = LinkedHashMap<String, MutableList<String>>()
+        val rootFiles = ArrayList<String>()
+
+        for (p in normalized) {
+            val slashIdx = p.indexOf('/')
+            if (slashIdx < 0) {
+                rootFiles.add(p)
+            } else {
+                val dir = p.substring(0, slashIdx)
+                grouped.getOrPut(dir) { ArrayList() }.add(p)
+            }
+        }
+
+        val result = ArrayList<String>()
+        // For directories with ≥3 files, use a single folder pattern
+        for ((dir, files) in grouped) {
+            if (files.size >= 3) {
+                result.add("/$dir/")
+            } else {
+                files.forEach { result.add(it) }
+            }
+        }
+        // Root files are added individually
+        result.addAll(rootFiles)
+        return result
     }
 
     private fun markExcluded(dir: VirtualFile) {

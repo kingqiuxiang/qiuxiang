@@ -42,12 +42,18 @@ class AiJanitorConfigurable : Configurable {
                 row("可疑文件转存目录：") {
                     textField().bindText(state::archiveDir).columns(40)
                 }.comment("相对项目根目录；会自动加入 .gitignore 并标记为 Excluded。")
-                row("配置文件移入目录：") {
+                row("配置文件移入目录（旧版兼容）：") {
                     textField().bindText(state::ignoreDir).columns(40)
-                }.comment("项目/AI 配置文件会移入此 ignore/exclude 目录。")
+                }.comment("「移入 /info/exclude」操作会将文件添加至 .git/info/exclude，不再移动到此目录。")
                 row("额外临时文件名规则：") {
                     textField().bindText(state::extraTempPatterns).columns(40)
                 }.comment("逗号分隔，支持 * 和 ? 通配，例如：*.tmp, draft_*.md")
+                row("AI 工具所需文件规则：") {
+                    textField().bindText(state::aiKeepPatterns).columns(40)
+                }.comment("逗号分隔，匹配的文件将标记为 AI 配置并自动保留，例如：CLAUDE.md, .cursorrules, *.aidigest")
+                row("永久忽略文件规则：") {
+                    textField().bindText(state::permanentIgnorePatterns).columns(40)
+                }.comment("逗号分隔，支持 * 和 ? 通配。匹配的文件在扫描时自动跳过。通过右键菜单「以后均忽略」自动添加。")
                 row {
                     checkBox("打开项目时提示扫描").bindSelected(state::promptOnOpen)
                 }

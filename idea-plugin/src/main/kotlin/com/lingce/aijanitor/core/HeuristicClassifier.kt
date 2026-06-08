@@ -15,13 +15,37 @@ object HeuristicClassifier {
 
     private val TEMP_EXTENSIONS = setOf(
         "tmp", "temp", "bak", "old", "orig", "rej", "swp", "swo", "swn",
-        "cache", "crdownload", "part", "partial", "download", "log", "pyc", "pyo",
-        "class", "o", "obj", "lock~",
+        "cache", "crdownload", "part", "partial", "download", "log", "logs",
+        "pyc", "pyo", "class", "o", "obj", "lock~",
     )
 
     private val TEMP_NAMES = setOf(
         ".ds_store", "thumbs.db", "desktop.ini", "npm-debug.log", "yarn-error.log",
         "pnpm-debug.log", ".eslintcache", ".stylelintcache",
+    )
+
+    /** File name patterns (glob-ish) that indicate log/output files. */
+    private val LOG_NAME_PATTERNS = listOf(
+        Regex(".*\\.log\\.[0-9]+", RegexOption.IGNORE_CASE),   // log.1, log.20250101
+        Regex(".*\\.log\\.[a-z]+", RegexOption.IGNORE_CASE),   // log.gz
+        Regex(".*[-_]log\\.[a-z0-9]+", RegexOption.IGNORE_CASE), // error-log.txt
+        Regex(".*\\.std(out|err)$", RegexOption.IGNORE_CASE),  // .stdout, .stderr
+        Regex(".*\\.output$", RegexOption.IGNORE_CASE),        // .output
+        Regex("catalina.*\\.log", RegexOption.IGNORE_CASE),    // catalina.out / catalina.log
+        Regex(".*\\.(log|out|err)$", RegexOption.IGNORE_CASE), // any .log/.out/.err
+    )
+
+    /** Strong content patterns: a single hit is enough to flag a file as log output. */
+    private val STRONG_LOG_MARKERS = listOf(
+        "log level", "log-level", "stack trace", "stacktrace",
+        "exception in thread", "at java.", "at org.", "caused by:",
+    )
+
+    /** Weak content patterns: need 3+ distinct hits to flag a file as log output.
+     *  Individually these words (error:, info:, etc.) appear in normal docs/code
+     *  describing error handling — a single match must never trigger TEMP. */
+    private val WEAK_LOG_MARKERS = listOf(
+        "error:", "warn:", "info:", "debug:", "trace:", "fatal:",
     )
 
     /** AI assistant / tooling configuration files. */
@@ -32,11 +56,33 @@ object HeuristicClassifier {
         "claude.md", "agents.md", "gemini.md", "copilot-instructions.md",
         ".aiexclude", ".aiignore", ".codeiumignore", ".tabnine_root",
         ".specstory", ".coderabbit.yaml",
+        ".agnix.toml", ".claudeignore",
     )
 
     private val AI_CONFIG_DIR_HINTS = setOf(
         ".cursor", ".continue", ".aider", ".codeium", ".tabnine", ".roo",
         ".github/copilot", ".specstory", ".claude", ".windsurf",
+        ".ai", ".codebuddy", ".fastrequest", ".codegraph", ".ruler",
+        ".cline", ".trae", ".qwen", ".lingma",
+    )
+
+    /** Directories that contain auto-generated data from AI/MCP tools — not project source. */
+    private val TOOL_DATA_DIRS = setOf(
+        ".playwright-mcp", ".playwright", "playwright-report", "test-results",
+        ".mcp", ".mcp-servers",
+    )
+
+    /** File name patterns that look like tool output/results (not real project files). */
+    private val TOOL_OUTPUT_NAME_PATTERNS = listOf(
+        Regex(".*[-_]results\\.(json|yml|yaml|xml|csv)$", RegexOption.IGNORE_CASE),
+        Regex(".*[-_]exploration\\.(json|yml|yaml|xml|csv)$", RegexOption.IGNORE_CASE),
+        Regex(".*[-_]summary\\.(json|yml|yaml|xml)$", RegexOption.IGNORE_CASE),
+        Regex(".*[-_]reference\\.(json|yml|yaml|xml)$", RegexOption.IGNORE_CASE),
+        Regex("proxy[-_]resp\\.(json|yml|yaml)$", RegexOption.IGNORE_CASE),
+        Regex("explore[-_]calls\\.(json|yml|yaml)$", RegexOption.IGNORE_CASE),
+        Regex("agnix-(out|err)\\.(json|txt)$", RegexOption.IGNORE_CASE),
+        Regex("api[-_]params[-_]reference\\.(json|yml|yaml)$", RegexOption.IGNORE_CASE),
+        Regex("api[-_]exploration[-_]summary\\.(json|yml|yaml)$", RegexOption.IGNORE_CASE),
     )
 
     /** Regular project / tooling configuration files. */
@@ -81,14 +127,46 @@ object HeuristicClassifier {
         "toml", "ini", "properties", "dart", "lua", "r", "ipynb", "proto",
     )
 
-    fun classify(file: VirtualFile, relativePath: String, contentSnippet: String?, extraTempPatterns: List<String>): Classification {
+    fun classify(
+        file: VirtualFile,
+        relativePath: String,
+        contentSnippet: String?,
+        extraTempPatterns: List<String>,
+        aiKeepPatterns: List<String>,
+    ): Classification {
         val name = file.name.lowercase(Locale.ROOT)
         val ext = file.extension?.lowercase(Locale.ROOT).orEmpty()
         val path = relativePath.lowercase(Locale.ROOT).replace('\\', '/')
 
+        // 0) Log / output files (check before AI config to prevent misclassification).
+        val isLogName = ext == "log" || ext == "logs" ||
+            LOG_NAME_PATTERNS.any { it.matches(name) } ||
+            LOG_NAME_PATTERNS.any { it.matches(relativePath) }
+        val isLogContent = contentSnippet != null && isStrongLogContent(contentSnippet)
+        if (isLogName || isLogContent) {
+            val reason = if (isLogContent) "文件内容包含日志特征" else "日志/输出文件"
+            return Classification(FileCategory.TEMP, reason, CleanupAction.DELETE, selectedByDefault = true)
+        }
+
+        // 0.5) Tool data / MCP cache directories — auto-generated, should be git-excluded.
+        val inToolDataDir = TOOL_DATA_DIRS.any { d ->
+            path == d || path.startsWith("$d/")
+        }
+        if (inToolDataDir) {
+            return Classification(FileCategory.TEMP, "AI 工具/MCP 自动生成的数据目录", CleanupAction.IGNORE, selectedByDefault = true)
+        }
+
+        // 0.6) Tool output files by name pattern (e.g. kyc-results.json, proxy-resp.json).
+        if (TOOL_OUTPUT_NAME_PATTERNS.any { it.matches(name) || it.matches(relativePath) }) {
+            return Classification(FileCategory.TEMP, "疑似工具/脚本输出的临时文件", CleanupAction.DELETE, selectedByDefault = true)
+        }
+
         // 1) AI config (highest priority so we never delete them).
-        if (name in AI_CONFIG_NAMES || AI_CONFIG_DIR_HINTS.any { path.contains("$it/") || path.startsWith("$it/") }) {
-            return Classification(FileCategory.AI_CONFIG, "AI 工具配置文件", CleanupAction.IGNORE, selectedByDefault = false)
+        val builtinAiConfig = name in AI_CONFIG_NAMES || AI_CONFIG_DIR_HINTS.any { path.contains("$it/") || path.startsWith("$it/") }
+        val userAiKeep = aiKeepPatterns.any { matchesGlob(file.name, it) }
+        if (builtinAiConfig || userAiKeep) {
+            val reason = if (userAiKeep) "AI 工具所需配置文件（用户规则）" else "AI 工具配置文件"
+            return Classification(FileCategory.AI_CONFIG, reason, CleanupAction.IGNORE, selectedByDefault = false)
         }
 
         // 2) Project config.
@@ -126,6 +204,19 @@ object HeuristicClassifier {
         // 7) Everything else is unknown / suspicious.
         val reason = if (ext.isBlank()) "无扩展名的未知文件" else "未识别的文件类型 .$ext"
         return Classification(FileCategory.SUSPICIOUS, reason, CleanupAction.ARCHIVE, selectedByDefault = false)
+    }
+
+    /**
+     * Returns true when [snippet] strongly resembles log output.
+     * A single strong marker (stack trace, "exception in thread", etc.) is enough,
+     * or 3+ distinct weak markers ("error:", "warn:", …) appearing together.
+     * This avoids false positives on docs that mention "error:" in API descriptions.
+     */
+    private fun isStrongLogContent(snippet: String): Boolean {
+        val lower = snippet.lowercase(Locale.ROOT)
+        if (STRONG_LOG_MARKERS.any { lower.contains(it) }) return true
+        val weakHits = WEAK_LOG_MARKERS.count { lower.contains(it) }
+        return weakHits >= 3
     }
 
     private fun matchesGlob(name: String, glob: String): Boolean {

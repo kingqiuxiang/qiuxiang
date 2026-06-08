@@ -22,7 +22,7 @@ class AiJanitorSettings : PersistentStateComponent<AiJanitorSettings.State> {
         var model: String = "gpt-4o-mini",
         /** Directory (relative to project root) used for "archive / 转存". */
         var archiveDir: String = ".ai-archive/quarantine",
-        /** Directory (relative to project root) used for "ignore/exclude". */
+        /** Directory (relative to project root) — legacy, kept for backward compat. */
         var ignoreDir: String = ".ai-archive/ignored",
         /** Whether to call the AI model to refine the heuristic classification. */
         var useAi: Boolean = true,
@@ -32,6 +32,10 @@ class AiJanitorSettings : PersistentStateComponent<AiJanitorSettings.State> {
         var aiBatchSize: Int = 30,
         /** Extra glob-ish name patterns (comma separated) treated as temp/junk. */
         var extraTempPatterns: String = "",
+        /** Patterns (comma separated) for files that AI tools need — shown as AI_CONFIG, not cleaned. */
+        var aiKeepPatterns: String = "",
+        /** Glob patterns (comma separated) for files to permanently skip during scan. */
+        var permanentIgnorePatterns: String = "",
     )
 
     private var state = State()

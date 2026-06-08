@@ -27,6 +27,7 @@ class ProjectScanner(private val project: Project) {
         val settings = AiJanitorSettings.getInstance().state
         val extraPatterns = settings.extraTempPatterns.split(',').map { it.trim() }.filter { it.isNotEmpty() }
         val aiKeepPatterns = settings.aiKeepPatterns.split(',').map { it.trim() }.filter { it.isNotEmpty() }
+        val permanentIgnorePatterns = settings.permanentIgnorePatterns.split(',').map { it.trim() }.filter { it.isNotEmpty() }
 
         val base = project.guessProjectDir() ?: return@compute ScanResult(emptyList(), emptyMap(), 0)
         val basePath = base.path
@@ -69,6 +70,11 @@ class ProjectScanner(private val project: Project) {
             // Skip files already tracked by git — they are legitimate project files.
             if (rel in gitTrackedFiles) {
                 gitTrackedSkipped++
+                continue
+            }
+
+            // Skip files matching permanent-ignore globs (user-chosen "以后均忽略").
+            if (permanentIgnorePatterns.any { matchesFileNameGlob(vf.name, it) }) {
                 continue
             }
 
@@ -278,6 +284,16 @@ class ProjectScanner(private val project: Project) {
             }
         }
         return excluded
+    }
+
+    private fun matchesFileNameGlob(name: String, glob: String): Boolean {
+        if (glob.isBlank()) return false
+        val regex = Regex(
+            "^" + Regex.escape(glob.lowercase())
+                .replace("\\*", ".*")
+                .replace("\\?", ".") + "$"
+        )
+        return regex.matches(name.lowercase())
     }
 
     companion object {
