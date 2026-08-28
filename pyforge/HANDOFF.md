@@ -6,7 +6,7 @@
 
 ```yaml
 schema: pyforge-handoff-v1
-updated_at: 2026-08-28T20:10:00+08:00
+updated_at: 2026-08-28T20:20:00+08:00
 slice_id: DONE
 phase: daily
 freeze_features: false
@@ -16,7 +16,7 @@ allowed_paths:
   - HANDOFF.md
   - packs/_inbox.md
   - knowledge/cards/**
-last_completed: "课表 48 周 verify 目标闭包；ci.ps1 跑全量 pytest；verify_all.ps1 含 cov/import/seed/backup/prod-doctor。store/__main__/CLI end/doctor/commands 补测。"
+last_completed: "课表 48 周 verify 闭包。verify_all + bootstrap 绿；pytest 72；cov 99%；prod doctor 在 DEBUG=True 必红；pwsh 认 uv 退出码。"
 next_command: "cd pyforge && export PATH=\"$HOME/.local/bin:$PATH\" && uv sync --frozen && pwsh -File scripts/verify_all.ps1 && pwsh -File scripts/bootstrap.ps1"
 blocked: ""
 do_not_touch:
