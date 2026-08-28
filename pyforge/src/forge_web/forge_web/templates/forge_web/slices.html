@@ -1,0 +1,21 @@
+{% extends "forge_web/base.html" %}
+{% block title %}PyForge 课表{% endblock %}
+{% block body %}
+  <section class="panel">
+    <h2>import_course 吃进来的 48 周</h2>
+    <table class="ledger">
+      <thead><tr><th>slice</th><th>title</th><th></th></tr></thead>
+      <tbody>
+        {% for row in slices %}
+        <tr>
+          <td class="mono">{{ row.slice_id }}</td>
+          <td>{{ row.title }}</td>
+          <td><a class="chip" href="/weeks/?prefill={{ row.slice_id|urlencode }}">开一条</a></td>
+        </tr>
+        {% empty %}
+        <tr><td colspan="3" class="empty">empty — 跑 import_course</td></tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </section>
+{% endblock %}

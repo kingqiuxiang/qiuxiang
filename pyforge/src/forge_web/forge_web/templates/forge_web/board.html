@@ -1,0 +1,31 @@
+{% extends "forge_web/base.html" %}
+{% block title %}PyForge 台账{% endblock %}
+{% block body %}
+  <section class="panel">
+    <h2>今晚炉子还热不热</h2>
+    <div class="stats">
+      <div class="stat"><span>open sessions</span><b>{{ open_count }}</b></div>
+      <div class="stat"><span>DailySession</span><b>{{ session_count }}</b></div>
+      <div class="stat"><span>课表切片</span><b>{{ slice_count }}</b></div>
+      <div class="stat"><span>门禁记录</span><b>{{ gate_count }}</b></div>
+    </div>
+  </section>
+  <section class="panel">
+    <h2>最近五条</h2>
+    <table class="ledger">
+      <thead><tr><th>slice</th><th>status</th><th>tags</th></tr></thead>
+      <tbody>
+        {% for session in recent %}
+        <tr>
+          <td class="mono"><a href="/weeks/">{{ session.slice_id }}</a></td>
+          <td><span class="badge {{ session.status }}">{{ session.status }}</span></td>
+          <td>{{ session.tags|join:", " }}</td>
+        </tr>
+        {% empty %}
+        <tr><td colspan="3" class="empty">empty — 去 weeks 开一条</td></tr>
+        {% endfor %}
+      </tbody>
+    </table>
+    <p><a class="btn" href="/weeks/">打开 weeks</a></p>
+  </section>
+{% endblock %}

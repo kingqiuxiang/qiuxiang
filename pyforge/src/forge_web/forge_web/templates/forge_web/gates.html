@@ -1,0 +1,22 @@
+{% extends "forge_web/base.html" %}
+{% block title %}PyForge 门禁{% endblock %}
+{% block body %}
+  <section class="panel">
+    <h2>CapabilityGate 试过没有</h2>
+    <table class="ledger">
+      <thead><tr><th>gate</th><th>slice</th><th>ok</th><th>error</th></tr></thead>
+      <tbody>
+        {% for row in attempts %}
+        <tr>
+          <td class="mono">{{ row.gate_name }}</td>
+          <td class="mono">{{ row.slice_id }}</td>
+          <td><span class="badge {% if row.ok %}open{% else %}idle{% endif %}">{% if row.ok %}ok{% else %}fail{% endif %}</span></td>
+          <td>{{ row.error|default:"—" }}</td>
+        </tr>
+        {% empty %}
+        <tr><td colspan="4" class="empty">empty — 还没有 GateAttempt</td></tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </section>
+{% endblock %}

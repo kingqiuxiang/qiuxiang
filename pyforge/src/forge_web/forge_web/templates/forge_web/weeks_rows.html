@@ -1,8 +1,27 @@
 {% for session in sessions %}
 <tr>
-  <td>{{ session.slice_id }}</td>
-  <td>{{ session.tags|join:"," }}</td>
+  <td class="mono">{{ session.slice_id }}</td>
+  <td><span class="badge {{ session.status }}">{{ session.status }}</span></td>
+  <td>
+    {% for item in session.tags %}
+      <a class="chip" href="/weeks/?tag={{ item|urlencode }}" hx-get="/weeks/?tag={{ item|urlencode }}" hx-target="#rows" hx-swap="innerHTML">{{ item }}</a>
+    {% empty %}
+      <span class="empty">—</span>
+    {% endfor %}
+  </td>
+  <td class="mono">
+    {% if session.started_at %}{{ session.started_at|date:"H:i" }}{% else %}—{% endif %}
+    {% if session.ended_at %}– {{ session.ended_at|date:"H:i" }}{% endif %}
+  </td>
+  <td class="actions">
+    {% if session.status != "open" %}
+      <button type="button" hx-post="{% url 'session_start' session.pk %}" hx-target="#rows" hx-swap="innerHTML" hx-include="#filter-tag">开工</button>
+    {% else %}
+      <button type="button" class="ghost" hx-post="{% url 'session_stop' session.pk %}" hx-target="#rows" hx-swap="innerHTML" hx-include="#filter-tag">收工</button>
+    {% endif %}
+    <button type="button" class="danger" hx-post="{% url 'session_delete' session.pk %}" hx-target="#rows" hx-swap="innerHTML" hx-include="#filter-tag" hx-confirm="删除 {{ session.slice_id }}？">删除</button>
+  </td>
 </tr>
 {% empty %}
-<tr><td colspan="2">empty</td></tr>
+<tr><td colspan="5" class="empty">empty</td></tr>
 {% endfor %}

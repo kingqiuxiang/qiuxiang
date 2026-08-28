@@ -33,6 +33,7 @@
 | W21 | [W21-01-Django对照Spring](W21-01-Django对照Spring.md) | /health/ ok |
 | W22 | [W22-01-ORM对齐三张表](W22-01-ORM对齐三张表.md) | 三张表+迁移 |
 | W23 | [W23-01-FBV与HTMX](W23-01-FBV与HTMX.md) | /weeks/ partial |
+| W23 夜2 | [W23-02-weeks有血肉](W23-02-weeks有血肉.md) | 开工 / 收工 / 点 tag / 台账 |
 | W24 | [W24-01-ModelForm与CSRF](W24-01-ModelForm与CSRF.md) | HTMX 建 session |
 | W25 | [W25-01-pytest-django工厂](W25-01-pytest-django工厂.md) | factories.py |
 | W26 | [W26-01-覆盖率门槛](W26-01-覆盖率门槛.md) | cov-fail-under=80 |

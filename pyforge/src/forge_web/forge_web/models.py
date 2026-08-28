@@ -12,6 +12,14 @@ class Session(models.Model):
     class Meta:
         db_table = "sessions"
 
+    @property
+    def status(self) -> str:
+        if self.started_at is not None and self.ended_at is None:
+            return "open"
+        if self.ended_at is not None:
+            return "stopped"
+        return "idle"
+
 
 class Slice(models.Model):
     slice_id = models.CharField(max_length=64, primary_key=True)

@@ -6,8 +6,8 @@
 
 ```yaml
 schema: pyforge-handoff-v1
-updated_at: 2026-08-28T20:20:00+08:00
-slice_id: DONE
+updated_at: 2026-08-28T20:40:00+08:00
+slice_id: W23-02
 phase: daily
 freeze_features: false
 unmerged_slices: 0
@@ -16,8 +16,8 @@ allowed_paths:
   - HANDOFF.md
   - packs/_inbox.md
   - knowledge/cards/**
-last_completed: "课表 48 周 verify 闭包。verify_all + bootstrap 绿；pytest 72；cov 99%；prod doctor 在 DEBUG=True 必红；pwsh 认 uv 退出码。"
-next_command: "cd pyforge && export PATH=\"$HOME/.local/bin:$PATH\" && uv sync --frozen && pwsh -File scripts/verify_all.ps1 && pwsh -File scripts/bootstrap.ps1"
+last_completed: "W23-02 锻造台：开工/收工/删除/点 tag，台账/课表/门禁，收工打番茄+错题 tag。"
+next_command: "cd pyforge && export PATH=\"$HOME/.local/bin:$PATH\" && uv run python src/forge_web/manage.py test forge_web.tests.test_week_list forge_web.tests.test_session_lifecycle forge_web.tests.test_board"
 blocked: ""
 do_not_touch:
   - 任何 mobile Java
