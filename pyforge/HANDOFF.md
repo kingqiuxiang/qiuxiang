@@ -6,21 +6,21 @@
 
 ```yaml
 schema: pyforge-handoff-v1
-updated_at: 2026-08-28T18:25:00+08:00
-slice_id: W02-01
+updated_at: 2026-08-28T18:50:00+08:00
+slice_id: W05
 phase: daily
 freeze_features: false
 unmerged_slices: 1
 inbox_pending: 0
 allowed_paths:
-  - src/pyforge/session.py
-  - tests/test_session.py
+  - src/pyforge/session_store.py
+  - tests/test_session_store.py
   - HANDOFF.md
   - packs/_inbox.md
   - knowledge/cards/**
   - AGENTS.md
-last_completed: "W01-02 过。tests/test_env.py 断言跑在 .venv；Cloud 上 uv prefix=/workspace/pyforge/.venv，系统 python3 prefix=/usr"
-next_command: "读 courses/lessons/W02-01-DailySession与可变默认参数.md；新建 src/pyforge/session.py 与 tests/test_session.py；uv run pytest tests/test_session.py -q；uv run python -c \"from pyforge.session import DailySession; a=DailySession('W02').start(); b=DailySession('W02').start(); a.tags.append('gil'); print(a.tags, b.tags)\""
+last_completed: "W04-02 / G1 过。DailySession + copying + SliceRegistry + CapabilityGate 全绿；没有 W05 课文 md，不准写落盘"
+next_command: "uv run pytest tests/test_session.py tests/test_copying.py tests/test_slices.py tests/test_gate.py -q；ls courses/lessons/W05*.md；没有本课 md 不准写 session store / json 落盘 / cli/"
 blocked: ""
 do_not_touch:
   - 任何 mobile Java
@@ -44,12 +44,12 @@ do_not_touch:
 
 ## 当前切片
 
-W02-01 DailySession 与可变默认参数（新建 `src/pyforge/session.py` + `tests/test_session.py`，tags 用 `default_factory`）
+W05 JSON 落盘（等 `courses/lessons/` 出现 W05 篇再写。G1 已绿，禁止提前建 `cli/`）
 
 ## 下一验收命令
 
 ```text
-uv run pytest tests/test_session.py -q
+uv run pytest tests/test_session.py tests/test_copying.py tests/test_slices.py tests/test_gate.py -q
 ```
 
 ## 完成定义
@@ -64,9 +64,9 @@ uv run pytest tests/test_session.py -q
 
 ## 三行状态
 
-- 做成了：W01-02 钉死项目 `.venv`；uv prefix 与系统 python3 prefix 不同；系统 `python3 -m pytest` 是 `No module named pytest`
-- 红/绿：`uv run pytest tests/test_version.py tests/test_env.py -q` 2 passed
-- 下一刀：W02-01，写下第一个领域对象 DailySession
+- 做成了：W01–W04 课文切片全绿；G1 收口（session / copying / slices / gate）
+- 红/绿：`uv run pytest tests/test_session.py tests/test_copying.py tests/test_slices.py tests/test_gate.py -q` 必须绿
+- 下一刀：W05 落盘，但仓库里还没有 W05 课文 md，不准先写
 
 ## 云上（Cursor Cloud / qiuxiang）
 
@@ -84,6 +84,7 @@ uv run pytest tests/test_session.py -q
 只改 pyforge/**。先读课文再写代码。W1–20 不准 django / frontend。
 你在 Ubuntu Cloud VM。uv 不在 PATH 时：export PATH="$HOME/.local/bin:$PATH"
 工作目录：cd /workspace/pyforge
-先跑：uv run pytest tests/test_version.py tests/test_env.py -q
-只做本文件 slice_id「今晚只改这一刀」，跑验收，回写 next_command，停。
+先跑：uv run pytest tests/test_session.py tests/test_copying.py tests/test_slices.py tests/test_gate.py -q
+只做本文件 slice_id「今晚只改这一刀」。没有本课 md 不准写代码。
+跑验收，回写 next_command，停。
 ```

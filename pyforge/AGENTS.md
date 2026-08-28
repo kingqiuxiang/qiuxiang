@@ -11,7 +11,7 @@
 3. 只做课文「今晚只改这一刀」。跑验收。回写 `HANDOFF.md` 的 `next_command`。停。
 4. 过不了验收就写 `blocked`（带复现命令），不要换切片、不要加框架。
 
-当前进度（2026-08-28）：**W01-02 已绿**（`tests/test_env.py` 钉死 `.venv`）。**下一刀看 `HANDOFF.md` 的 `slice_id`**（现为 W02-01）。禁止再跑 `uv init`。切片号以 `HANDOFF.md` 为准，不要信本段过期数字。
+当前进度（2026-08-28）：**W01–W04 / G1 已绿**。**下一刀看 `HANDOFF.md` 的 `slice_id`**（现为 W05，仓库尚无 W05 课文 md）。禁止再跑 `uv init`。切片号以 `HANDOFF.md` 为准，不要信本段过期数字。
 
 ## 命令
 
@@ -20,7 +20,7 @@
 ```bash
 export PATH="$HOME/.local/bin:$PATH"
 cd pyforge 2>/dev/null || true
-uv run pytest tests/test_version.py tests/test_env.py -q
+uv run pytest tests/test_version.py tests/test_env.py tests/test_session.py tests/test_copying.py tests/test_slices.py tests/test_gate.py -q
 uv run python -c "import pyforge; print(pyforge.__version__)"
 ```
 
@@ -51,7 +51,7 @@ Cloud Agent 跑在 **Ubuntu VM**，不是 Windows。本机 Windows 只负责 pus
 ```bash
 export PATH="$HOME/.local/bin:$PATH"
 cd /workspace/pyforge
-uv run pytest tests/test_version.py tests/test_env.py -q
+uv run pytest tests/test_version.py tests/test_env.py tests/test_session.py tests/test_copying.py tests/test_slices.py tests/test_gate.py -q
 uv run python -c "import pyforge; print(pyforge.__version__)"
 ```
 
@@ -71,7 +71,7 @@ uv run python -c "import pyforge; print(pyforge.__version__)"
 只改 pyforge/**。禁止改 server/ web/ idea-plugin，禁止动 Java。
 你在 Ubuntu Cloud VM。uv 不在 PATH 时：export PATH="$HOME/.local/bin:$PATH"
 工作目录：cd /workspace/pyforge
-先跑：uv run pytest tests/test_version.py tests/test_env.py -q  （必须绿，必须印出 0.1.0）
+先跑：uv run pytest tests/test_version.py tests/test_env.py tests/test_session.py tests/test_copying.py tests/test_slices.py tests/test_gate.py -q  （必须绿，必须印出 0.1.0）
 只做 HANDOFF.md 里 slice_id 那一课的「今晚只改这一刀」。没有本课 md 不准写代码。
 不要改 __version__，不要 uv init，不要装全局包，不要连做下一课。
 跑课文验收，回写 HANDOFF.md 的 next_command，补一张 knowledge/cards 四件套。新分支提交并开 PR。停。
