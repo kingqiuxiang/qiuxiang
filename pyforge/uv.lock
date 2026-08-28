@@ -233,6 +233,19 @@ wheels = [
 ]
 
 [[package]]
+name = "django-ninja"
+version = "1.6.3"
+source = { registry = "https://pypi.org/simple" }
+dependencies = [
+    { name = "django" },
+    { name = "pydantic" },
+]
+sdist = { url = "https://files.pythonhosted.org/packages/a2/57/71cc769a7410ade9bd1cddee16132e3da7718fcce1386c67ade7ea939677/django_ninja-1.6.3.tar.gz", hash = "sha256:a65a5016bbf044702fb1f1ff702f96dc3c806fbd7c918290512659531873039f", size = 2340438, upload-time = "2026-08-17T08:45:42.703Z" }
+wheels = [
+    { url = "https://files.pythonhosted.org/packages/e3/de/061d08265951765835166a2c69f0b99a8f49dfbea85d7d204ac87a236679/django_ninja-1.6.3-py3-none-any.whl", hash = "sha256:e83ba573e0f17b1d2fddca078613e2aaad512acb3d3c6bc9a5f1a0d9257dd70c", size = 2375010, upload-time = "2026-08-17T08:45:40.473Z" },
+]
+
+[[package]]
 name = "h11"
 version = "0.16.0"
 source = { registry = "https://pypi.org/simple" }
@@ -574,6 +587,7 @@ version = "0.1.0"
 source = { editable = "." }
 dependencies = [
     { name = "django" },
+    { name = "django-ninja" },
     { name = "httpx" },
     { name = "pydantic" },
     { name = "pyyaml" },
@@ -591,6 +605,7 @@ dev = [
 [package.metadata]
 requires-dist = [
     { name = "django", specifier = ">=5.1,<6" },
+    { name = "django-ninja", specifier = ">=1.6.3" },
     { name = "httpx", specifier = ">=0.28" },
     { name = "pydantic", specifier = ">=2.10" },
     { name = "pyyaml", specifier = ">=6.0" },

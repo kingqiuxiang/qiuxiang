@@ -8,13 +8,13 @@
 <body>
   <h1>weeks</h1>
   <form method="get" action="/weeks/" hx-get="/weeks/" hx-target="#rows" hx-swap="innerHTML">
-    <input name="tag" value="{{ tag }}" placeholder="tag">
+    <label>filter tag <input name="tag" value="{{ tag }}" placeholder="gil"></label>
     <button type="submit">filter</button>
   </form>
   <form method="post" action="/sessions/new/" hx-post="/sessions/new/" hx-target="#rows" hx-swap="innerHTML">
     {% csrf_token %}
-    {{ form.slice_id }}
-    {{ form.tags_text }}
+    <label>slice_id {{ form.slice_id }}</label>
+    <label>tags {{ form.tags_text }}</label>
     <button type="submit">create</button>
   </form>
   <table>
