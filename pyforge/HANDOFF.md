@@ -6,7 +6,7 @@
 
 ```yaml
 schema: pyforge-handoff-v1
-updated_at: 2026-08-28T18:15:00+08:00
+updated_at: 2026-08-28T18:25:00+08:00
 slice_id: W02-01
 phase: daily
 freeze_features: false
@@ -18,6 +18,7 @@ allowed_paths:
   - HANDOFF.md
   - packs/_inbox.md
   - knowledge/cards/**
+  - AGENTS.md
 last_completed: "W01-02 过。tests/test_env.py 断言跑在 .venv；Cloud 上 uv prefix=/workspace/pyforge/.venv，系统 python3 prefix=/usr"
 next_command: "读 courses/lessons/W02-01-DailySession与可变默认参数.md；新建 src/pyforge/session.py 与 tests/test_session.py；uv run pytest tests/test_session.py -q；uv run python -c \"from pyforge.session import DailySession; a=DailySession('W02').start(); b=DailySession('W02').start(); a.tags.append('gil'); print(a.tags, b.tags)\""
 blocked: ""
@@ -70,15 +71,19 @@ uv run pytest tests/test_session.py -q
 ## 云上（Cursor Cloud / qiuxiang）
 
 - 本仓独立。禁止从公司 `mobile` / `qiangungun` 起 Cloud。
-- VM 是 Ubuntu。读 `AGENTS.md` 的 Cloud 节，开场 prompt 整段贴那里。
-- 未 push 的提交 Cloud 看不见。
+- VM 是 Ubuntu。开场永远贴 `AGENTS.md` 的「Cloud 开场」（不要写死切片号）。切片只看本文件 `slice_id`。
+- 未 push 的提交 Cloud 看不见。基线必须带上最新本文件。
+- 仓根 `.cursor/environment.json` 会装 `uv`；开机 `start` 会在有 `pyforge/` 时 `uv sync --frozen`。
 - W01-02 实测：`uv run python` → `/workspace/pyforge/.venv`；`python3` → `/usr`
 
 ## 开场续跑
 
 ```text
 继续 PyForge。不要提问，不要改任何 Java / mobile。
-真源：HANDOFF.md + courses/lessons/ 当前篇。先读 AGENTS.md。
-先读课文再写代码。W1–20 不准 django / frontend。
-只做本课「今晚只改这一刀」，跑验收，回写 next_command，停。
+真源：pyforge/HANDOFF.md + courses/lessons/ 当前篇。先读 pyforge/AGENTS.md。
+只改 pyforge/**。先读课文再写代码。W1–20 不准 django / frontend。
+你在 Ubuntu Cloud VM。uv 不在 PATH 时：export PATH="$HOME/.local/bin:$PATH"
+工作目录：cd /workspace/pyforge
+先跑：uv run pytest tests/test_version.py tests/test_env.py -q
+只做本文件 slice_id「今晚只改这一刀」，跑验收，回写 next_command，停。
 ```
