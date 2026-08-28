@@ -1,4 +1,5 @@
 $ErrorActionPreference = "Stop"
+$PSNativeCommandUseErrorActionPreference = $true
 Set-Location $PSScriptRoot/..
 $env:PATH = "$env:HOME/.local/bin:$env:PATH"
 if (-not (Get-Command uv -ErrorAction SilentlyContinue)) {

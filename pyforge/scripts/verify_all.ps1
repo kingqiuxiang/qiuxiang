@@ -1,4 +1,5 @@
 $ErrorActionPreference = "Stop"
+$PSNativeCommandUseErrorActionPreference = $true
 Set-Location $PSScriptRoot/..
 $env:PATH = "$env:HOME/.local/bin:$env:PATH"
 
@@ -10,11 +11,10 @@ $backup = Join-Path ([System.IO.Path]::GetTempPath()) "pyforge-backup.json"
 uv run python src/forge_web/manage.py pyforge_backup --out $backup
 uv run python -m pyforge --version
 
-$prev = $ErrorActionPreference
-$ErrorActionPreference = "Continue"
+$PSNativeCommandUseErrorActionPreference = $false
 uv run python src/forge_web/manage.py pyforge_doctor --env prod
 $code = $LASTEXITCODE
-$ErrorActionPreference = $prev
+$PSNativeCommandUseErrorActionPreference = $true
 if ($code -eq 0) {
   throw "pyforge_doctor --env prod must fail when DEBUG=True"
 }

@@ -1,4 +1,5 @@
 $ErrorActionPreference = "Stop"
+$PSNativeCommandUseErrorActionPreference = $true
 Set-Location $PSScriptRoot/..
 $env:PATH = "$env:HOME/.local/bin:$env:PATH"
 uv run pytest tests src/forge_web/forge_web/tests -q
