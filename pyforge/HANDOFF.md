@@ -6,8 +6,8 @@
 
 ```yaml
 schema: pyforge-handoff-v1
-updated_at: 2026-08-28T20:40:00+08:00
-slice_id: W23-02
+updated_at: 2026-08-28T20:50:00+08:00
+slice_id: DONE
 phase: daily
 freeze_features: false
 unmerged_slices: 0
@@ -16,8 +16,8 @@ allowed_paths:
   - HANDOFF.md
   - packs/_inbox.md
   - knowledge/cards/**
-last_completed: "W23-02 锻造台：开工/收工/删除/点 tag，台账/课表/门禁，收工打番茄+错题 tag。"
-next_command: "cd pyforge && export PATH=\"$HOME/.local/bin:$PATH\" && uv run python src/forge_web/manage.py test forge_web.tests.test_week_list forge_web.tests.test_session_lifecycle forge_web.tests.test_board"
+last_completed: "W23-02 锻造台绿：开工/收工/删除/点 tag；台账/课表/门禁；verify_all 76 绿。"
+next_command: "cd pyforge && export PATH=\"$HOME/.local/bin:$PATH\" && uv sync --frozen && pwsh -File scripts/verify_all.ps1"
 blocked: ""
 do_not_touch:
   - 任何 mobile Java
@@ -54,8 +54,8 @@ pwsh -File scripts/verify_all.ps1
 
 ## 三行状态
 
-- 做成了：课文+实现+卡齐；`scripts/verify_all.ps1` 把课表验收收成一条
-- 红/绿：以 `pwsh -File scripts/verify_all.ps1` 为准
+- 做成了：48 周闭环 + 锻造台 UI（HTMX，不是 SPA）
+- 红/绿：verify_all 76；cov 99%
 - 下一刀：只修红。不要新开第二产品
 
 ## 云上
