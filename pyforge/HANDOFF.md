@@ -6,8 +6,8 @@
 
 ```yaml
 schema: pyforge-handoff-v1
-updated_at: 2026-08-28T20:50:00+08:00
-slice_id: DONE
+updated_at: 2026-08-28T21:20:00+08:00
+slice_id: W23-03
 phase: daily
 freeze_features: false
 unmerged_slices: 0
@@ -16,8 +16,8 @@ allowed_paths:
   - HANDOFF.md
   - packs/_inbox.md
   - knowledge/cards/**
-last_completed: "W23-02 锻造台绿：开工/收工/删除/点 tag；台账/课表/门禁；verify_all 76 绿。"
-next_command: "cd pyforge && export PATH=\"$HOME/.local/bin:$PATH\" && uv sync --frozen && pwsh -File scripts/verify_all.ps1"
+last_completed: "W23-03 编排：八层路径 /path/，课文 /lessons/Wxx/，官方开源讲解 + mermaid 图。"
+next_command: "cd pyforge && export PATH=\"$HOME/.local/bin:$PATH\" && uv run pytest tests/test_course_modules.py src/forge_web/forge_web/tests/test_course_path.py -q"
 blocked: ""
 do_not_touch:
   - 任何 mobile Java

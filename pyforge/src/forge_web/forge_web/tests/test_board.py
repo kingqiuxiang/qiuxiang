@@ -13,6 +13,7 @@ class BoardAndNavTests(TestCase):
         self.assertEqual(board.status_code, 200)
         self.assertContains(board, "W-board")
         self.assertContains(board, "打开 weeks")
+        self.assertContains(board, "打开编排")
 
         slices = self.client.get("/slices/")
         self.assertEqual(slices.status_code, 200)

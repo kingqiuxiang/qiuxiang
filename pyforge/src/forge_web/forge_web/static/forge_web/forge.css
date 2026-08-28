@@ -163,3 +163,50 @@ button:disabled { opacity: 0.45; cursor: not-allowed; }
 .empty { color: var(--muted); font-style: italic; }
 
 .htmx-request .busy { opacity: 0.6; }
+
+.lede { color: var(--muted); max-width: 42rem; }
+.muted { color: var(--muted); font-size: 0.9rem; }
+.crumb { color: var(--muted); margin: 0 0 0.8rem; }
+.layer-kicker {
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  font-size: 0.72rem;
+  color: var(--ember-hot);
+  margin: 0 0 0.3rem;
+}
+
+.week-strip {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.45rem;
+}
+
+.week-chip {
+  display: flex;
+  flex-direction: column;
+  min-width: 7.2rem;
+  max-width: 12rem;
+  padding: 0.45rem 0.55rem;
+  border: 1px solid var(--line);
+  background: #160f0b;
+  color: var(--ink);
+  text-decoration: none;
+}
+.week-chip span { color: var(--muted); font-size: 0.75rem; }
+.week-chip.done { border-color: #6a8f4a; }
+.week-chip:hover { border-color: var(--ember); text-decoration: none; }
+
+.prose p { line-height: 1.55; color: var(--ink); }
+.prose code, .prose-block code {
+  font-size: 0.85em;
+  background: #140e0a;
+  padding: 0.05rem 0.25rem;
+}
+.prose pre {
+  overflow: auto;
+  background: #120c09;
+  border: 1px solid var(--line);
+  padding: 0.75rem;
+}
+.sources { padding-left: 1.1rem; }
+.chip.on { border-color: var(--ember); color: var(--ember-hot); }

@@ -18,7 +18,7 @@
         <nav class="nav">
           <a href="/" {% if request.path == "/" %}aria-current="page"{% endif %}>台账</a>
           <a href="/weeks/" {% if request.path == "/weeks/" %}aria-current="page"{% endif %}>weeks</a>
-          <a href="/slices/" {% if request.path == "/slices/" %}aria-current="page"{% endif %}>课表</a>
+          <a href="/path/" {% if "/path/" in request.path or "/lessons/" in request.path %}aria-current="page"{% endif %}>编排</a>
           <a href="/gates/" {% if request.path == "/gates/" %}aria-current="page"{% endif %}>门禁</a>
         </nav>
       </div>
@@ -29,5 +29,6 @@
     </header>
     {% block body %}{% endblock %}
   </div>
+  {% block extra_js %}{% endblock %}
 </body>
 </html>

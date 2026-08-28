@@ -1,11 +1,13 @@
 from __future__ import annotations
 
-from django.http import HttpRequest, HttpResponse
+from django.http import Http404, HttpRequest, HttpResponse
 from django.shortcuts import get_object_or_404, redirect, render
 from django.views.decorators.http import require_http_methods
 
 from forge_web.actions import delete_session, start_session, stop_session
+from forge_web.catalog import build_module, build_path, build_week_context
 from forge_web.forms import SessionForm
+from forge_web.lesson_io import list_lessons, read_lesson
 from forge_web.metrics import current
 from forge_web.models import GateAttempt, Session, Slice
 
@@ -52,18 +54,74 @@ def render_weeks(request: HttpRequest, form: SessionForm | None = None) -> HttpR
     return render(request, template, context)
 
 
+def _chrome() -> dict[str, int]:
+    return {
+        "open_count": Session.objects.filter(started_at__isnull=False, ended_at__isnull=True).count(),
+        "request_count": current(),
+    }
+
+
 def board(request: HttpRequest) -> HttpResponse:
     recent = list(Session.objects.all().order_by("-id")[:5])
+    modules, _progression = build_path()
+    tonight = next((item for item in modules if item.touched < len(item.weeks)), modules[-1])
     return render(
         request,
         "forge_web/board.html",
         {
-            "open_count": Session.objects.filter(started_at__isnull=False, ended_at__isnull=True).count(),
+            **_chrome(),
             "slice_count": Slice.objects.count(),
             "gate_count": GateAttempt.objects.count(),
             "session_count": Session.objects.count(),
-            "request_count": current(),
             "recent": recent,
+            "tonight": tonight,
+        },
+    )
+
+
+def course_path(request: HttpRequest) -> HttpResponse:
+    modules, progression = build_path()
+    return render(
+        request,
+        "forge_web/path.html",
+        {**_chrome(), "modules": modules, "progression": progression},
+    )
+
+
+def course_module(request: HttpRequest, module_id: str) -> HttpResponse:
+    try:
+        module = build_module(module_id)
+    except KeyError as err:
+        raise Http404("module") from err
+    return render(request, "forge_web/module.html", {**_chrome(), "module": module})
+
+
+def lesson_read(request: HttpRequest, week: int) -> HttpResponse:
+    if week < 1 or week > 48:
+        raise Http404("week")
+    try:
+        module, spec = build_week_context(week)
+    except KeyError as err:
+        raise Http404("week") from err
+    lessons = list_lessons(week)
+    if not lessons:
+        raise Http404("lesson")
+    chosen = request.GET.get("night") or lessons[0].slug
+    current = next((item for item in lessons if item.slug == chosen), lessons[0])
+    title, sections = read_lesson(current.path)
+    return render(
+        request,
+        "forge_web/lesson.html",
+        {
+            **_chrome(),
+            "module": module,
+            "spec": spec,
+            "code": f"W{week:02d}",
+            "week": week,
+            "lessons": lessons,
+            "current": current,
+            "title": title,
+            "sections": sections,
         },
     )
 

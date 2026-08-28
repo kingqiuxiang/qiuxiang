@@ -1,0 +1,46 @@
+{% extends "forge_web/base.html" %}
+{% block title %}{{ code }} {{ title }}{% endblock %}
+{% block body %}
+  <p class="crumb"><a href="/path/">编排</a> / <a href="/path/{{ module.id }}/">{{ module.title }}</a> / {{ code }}</p>
+  <section class="panel">
+    <p class="layer-kicker">{{ module.title }} · {{ module.gate }} · 交 {{ spec.ship }}</p>
+    <h2>{{ title }}</h2>
+    <p class="lede">{{ spec.slice }}。验收：<code>{{ spec.verify }}</code></p>
+    {% if lessons|length > 1 %}
+    <p class="nights">
+      {% for item in lessons %}
+        <a class="chip {% if item.slug == current.slug %}on{% endif %}" href="/lessons/{{ code }}/?night={{ item.slug }}">{{ item.title }}</a>
+      {% endfor %}
+    </p>
+    {% endif %}
+    <p class="actions">
+      <a class="btn" href="/weeks/?prefill={{ code }}">开工这条</a>
+      <a class="btn ghost" href="/path/{{ module.id }}/">回本层</a>
+    </p>
+  </section>
+  {% if module.diagram %}
+  <section class="panel">
+    <h2>本层流程图</h2>
+    <pre class="mermaid">{{ module.diagram }}</pre>
+  </section>
+  {% endif %}
+  <section class="panel">
+    <h2>开源讲解</h2>
+    <div class="prose">{{ module.explain|linebreaks }}</div>
+    <ul class="sources">
+      {% for src in module.sources %}
+      <li><a href="{{ src.url }}" rel="noreferrer">{{ src.title }}</a></li>
+      {% endfor %}
+    </ul>
+  </section>
+  {% for section in sections %}
+  <section class="panel prose-block">
+    <h2>{{ section.heading }}</h2>
+    <div class="prose">{{ section.html|safe }}</div>
+  </section>
+  {% endfor %}
+{% endblock %}
+{% block extra_js %}
+<script src="https://cdn.jsdelivr.net/npm/mermaid@11/dist/mermaid.min.js"></script>
+<script>mermaid.initialize({ startOnLoad: true, theme: "dark" });</script>
+{% endblock %}

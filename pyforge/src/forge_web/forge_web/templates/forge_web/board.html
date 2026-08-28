@@ -26,6 +26,14 @@
         {% endfor %}
       </tbody>
     </table>
-    <p><a class="btn" href="/weeks/">打开 weeks</a></p>
+    <p><a class="btn" href="/weeks/">打开 weeks</a>
+       <a class="btn ghost" href="/path/">打开编排</a></p>
   </section>
+  {% if tonight %}
+  <section class="panel">
+    <h2>今晚从这一层续</h2>
+    <p class="lede">L{{ tonight.spec.layer }} {{ tonight.spec.title }} · {{ tonight.spec.gist }}</p>
+    <p><a class="btn" href="/path/{{ tonight.spec.id }}/">进入 {{ tonight.spec.title }}</a></p>
+  </section>
+  {% endif %}
 {% endblock %}
