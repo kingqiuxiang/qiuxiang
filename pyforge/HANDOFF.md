@@ -6,7 +6,7 @@
 
 ```yaml
 schema: pyforge-handoff-v1
-updated_at: 2026-08-28T19:30:00+08:00
+updated_at: 2026-08-28T19:45:00+08:00
 slice_id: DONE
 phase: daily
 freeze_features: false
@@ -16,7 +16,7 @@ allowed_paths:
   - HANDOFF.md
   - packs/_inbox.md
   - knowledge/cards/**
-last_completed: "W05–W48 课文+实现+G1–G12 绿。补齐 W05–W48 四件套卡；同进程 Ninja /api/health；浏览器点过 /weeks/ 建 W-browser 并筛选。"
+last_completed: "W05–W48 课文+实现+G1–G12 绿。四件套卡、ObservationEvent、Ninja /api/health+/api/sessions、/weeks/ 表单标签。pytest 49 绿，cov 91%。"
 next_command: "cd pyforge && export PATH=\"$HOME/.local/bin:$PATH\" && uv sync --frozen && pwsh -File scripts/ci.ps1 && pwsh -File scripts/bootstrap.ps1 && uv run pytest --cov=src/pyforge --cov-fail-under=80 -q"
 blocked: ""
 do_not_touch:
@@ -55,7 +55,7 @@ pwsh -File scripts/ci.ps1
 ## 三行状态
 
 - 做成了：课文 W05–W48 推演齐；内核 + Django + 插件 + doctor/backup/seed + ci/bootstrap 能跑
-- 红/绿：G1–G12 在本 VM 绿；`pytest --cov=src/pyforge --cov-fail-under=80` 87%
+- 红/绿：G1–G12 在本 VM 绿；`pytest --cov=src/pyforge --cov-fail-under=80` 91%
 - 下一刀：只修红。不要新开第二产品
 
 ## 云上
