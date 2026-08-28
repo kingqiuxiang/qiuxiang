@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+  <meta charset="utf-8">
+  <title>PyForge weeks</title>
+  <script src="https://unpkg.com/htmx.org@1.9.12"></script>
+</head>
+<body>
+  <h1>weeks</h1>
+  <form method="get" action="/weeks/" hx-get="/weeks/" hx-target="#rows" hx-swap="innerHTML">
+    <input name="tag" value="{{ tag }}" placeholder="tag">
+    <button type="submit">filter</button>
+  </form>
+  <form method="post" action="/sessions/new/" hx-post="/sessions/new/" hx-target="#rows" hx-swap="innerHTML">
+    {% csrf_token %}
+    {{ form.slice_id }}
+    {{ form.tags_text }}
+    <button type="submit">create</button>
+  </form>
+  <table>
+    <thead><tr><th>slice</th><th>tags</th></tr></thead>
+    <tbody id="rows">{% include "forge_web/weeks_rows.html" %}</tbody>
+  </table>
+</body>
+</html>
