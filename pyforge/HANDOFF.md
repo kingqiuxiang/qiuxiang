@@ -6,7 +6,7 @@
 
 ```yaml
 schema: pyforge-handoff-v1
-updated_at: 2026-08-28T19:50:00+08:00
+updated_at: 2026-08-28T20:10:00+08:00
 slice_id: DONE
 phase: daily
 freeze_features: false
@@ -16,8 +16,8 @@ allowed_paths:
   - HANDOFF.md
   - packs/_inbox.md
   - knowledge/cards/**
-last_completed: "W05–W48 课文+实现+G1–G12 绿。四件套卡、ObservationEvent、Ninja /api/health+/api/sessions、/weeks/ 表单标签。pytest 49 绿，cov 91%。"
-next_command: "cd pyforge && export PATH=\"$HOME/.local/bin:$PATH\" && uv sync --frozen && pwsh -File scripts/ci.ps1 && pwsh -File scripts/bootstrap.ps1 && uv run pytest --cov=src/pyforge --cov-fail-under=80 -q"
+last_completed: "课表 48 周 verify 目标闭包；ci.ps1 跑全量 pytest；verify_all.ps1 含 cov/import/seed/backup/prod-doctor。store/__main__/CLI end/doctor/commands 补测。"
+next_command: "cd pyforge && export PATH=\"$HOME/.local/bin:$PATH\" && uv sync --frozen && pwsh -File scripts/verify_all.ps1 && pwsh -File scripts/bootstrap.ps1"
 blocked: ""
 do_not_touch:
   - 任何 mobile Java
@@ -43,7 +43,7 @@ do_not_touch:
 ## 下一验收命令
 
 ```text
-pwsh -File scripts/ci.ps1
+pwsh -File scripts/verify_all.ps1
 ```
 
 ## 完成定义
@@ -54,8 +54,8 @@ pwsh -File scripts/ci.ps1
 
 ## 三行状态
 
-- 做成了：课文 W05–W48 推演齐；内核 + Django + 插件 + doctor/backup/seed + ci/bootstrap 能跑
-- 红/绿：G1–G12 在本 VM 绿；`pytest --cov=src/pyforge --cov-fail-under=80` 91%
+- 做成了：课文+实现+卡齐；`scripts/verify_all.ps1` 把课表验收收成一条
+- 红/绿：以 `pwsh -File scripts/verify_all.ps1` 为准
 - 下一刀：只修红。不要新开第二产品
 
 ## 云上

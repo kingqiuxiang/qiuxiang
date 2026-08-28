@@ -1,3 +1,5 @@
+from argparse import ArgumentParser
+
 from django.conf import settings
 from django.core.management.base import BaseCommand, CommandError
 from django.db import connection
@@ -6,7 +8,7 @@ from django.db import connection
 class Command(BaseCommand):
     help = "Check PyForge environment"
 
-    def add_arguments(self, parser) -> None:  # type: ignore[no-untyped-def]
+    def add_arguments(self, parser: ArgumentParser) -> None:
         parser.add_argument("--env", default="dev")
 
     def handle(self, *args: object, **options: object) -> None:

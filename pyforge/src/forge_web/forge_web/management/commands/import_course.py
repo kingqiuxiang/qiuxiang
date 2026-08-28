@@ -1,3 +1,4 @@
+from argparse import ArgumentParser
 from pathlib import Path
 
 import yaml
@@ -10,7 +11,7 @@ from pyforge.domain.manifest import CourseManifest
 class Command(BaseCommand):
     help = "Import courses/curriculum.yaml"
 
-    def add_arguments(self, parser) -> None:  # type: ignore[no-untyped-def]
+    def add_arguments(self, parser: ArgumentParser) -> None:
         parser.add_argument("path")
 
     def handle(self, *args: object, **options: object) -> None:

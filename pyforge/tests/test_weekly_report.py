@@ -10,3 +10,5 @@ def test_weekly_report_counts_and_dedupes_tags() -> None:
     report = WeeklyReportService().build("W20", [a, b])
     assert report.session_count == 2
     assert report.tags == ("gil", "uv")
+    grouped = WeeklyReportService().group_by_slice_prefix([a, b])
+    assert grouped["W20"] == 2

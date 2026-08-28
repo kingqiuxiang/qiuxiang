@@ -1,4 +1,5 @@
 import json
+from argparse import ArgumentParser
 from pathlib import Path
 
 from django.core.management.base import BaseCommand
@@ -9,7 +10,7 @@ from forge_web.backup import backup_sessions, restore_sessions
 class Command(BaseCommand):
     help = "Backup or restore sessions"
 
-    def add_arguments(self, parser) -> None:  # type: ignore[no-untyped-def]
+    def add_arguments(self, parser: ArgumentParser) -> None:
         parser.add_argument("--restore", default="")
         parser.add_argument("--out", default="pyforge-backup.json")
 

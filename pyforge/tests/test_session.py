@@ -24,3 +24,13 @@ def test_stop_without_start_raises():
         assert "not started" in str(exc)
     else:
         raise AssertionError("expected RuntimeError")
+
+
+def test_start_twice_raises():
+    s = DailySession("W02").start()
+    try:
+        s.start()
+    except RuntimeError as exc:
+        assert "already started" in str(exc)
+    else:
+        raise AssertionError("expected RuntimeError")
