@@ -1,0 +1,38 @@
+{% extends "forge_web/base.html" %}
+{% block title %}L{{ module.spec.layer }} {{ module.spec.title }}{% endblock %}
+{% block body %}
+  <p class="crumb"><a href="/path/">编排</a> / {{ module.spec.title }}</p>
+  <section class="panel">
+    <p class="layer-kicker">L{{ module.spec.layer }} · {{ module.spec.gate }}</p>
+    <h2>{{ module.spec.title }}</h2>
+    <p class="lede">{{ module.spec.gist }}</p>
+    <div class="prose">{{ module.spec.explain|linebreaks }}</div>
+  </section>
+  <section class="panel">
+    <h2>本层架构</h2>
+    <pre class="mermaid">{{ module.spec.diagram|safe }}</pre>
+  </section>
+  <section class="panel">
+    <h2>开源讲解（官方文档，不是抄书）</h2>
+    <ul class="sources">
+      {% for src in module.spec.sources %}
+      <li><a href="{{ src.url }}" rel="noreferrer">{{ src.title }}</a></li>
+      {% endfor %}
+    </ul>
+  </section>
+  <section class="panel">
+    <h2>本层的周</h2>
+    <div class="week-strip">
+      {% for week in module.weeks %}
+      <a class="week-chip {% if week.touched %}done{% endif %}" href="/lessons/{{ week.code }}/">
+        <b>{{ week.code }}</b>
+        <span>{{ week.title }}</span>
+      </a>
+      {% endfor %}
+    </div>
+  </section>
+{% endblock %}
+{% block extra_js %}
+<script src="https://cdn.jsdelivr.net/npm/mermaid@11/dist/mermaid.min.js"></script>
+<script>mermaid.initialize({ startOnLoad: true, theme: "dark" });</script>
+{% endblock %}

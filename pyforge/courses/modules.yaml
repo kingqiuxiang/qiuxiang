@@ -1,0 +1,176 @@
+# 课表编排真源。周次仍以 curriculum.yaml 为准。这里只分层、讲解、图、开源入口。
+version: 1
+modules:
+  - id: foundation
+    title: 基础
+    layer: 1
+    weeks: [1, 2, 3, 4]
+    gate: G1
+    gist: 解释器、函数、容器、值对象。先能看见 Python 和 Java 不是同一套内存直觉。
+    explain: |
+      这一层不讲框架。把模块、LEGB、可变默认参数、浅拷贝、frozen dataclass 钉死。
+      CPython 教程和数据模型是开源真源：模块怎么被找到、对象怎么比相等。
+      过 G1 才能进内核落地。DailySession 从这里出场，后面只换皮。
+    sources:
+      - { title: "CPython tutorial — modules", url: "https://docs.python.org/3/tutorial/modules.html" }
+      - { title: "CPython tutorial — control flow / functions", url: "https://docs.python.org/3/tutorial/controlflow.html" }
+      - { title: "datamodel — objects, types, __eq__", url: "https://docs.python.org/3/reference/datamodel.html" }
+    diagram: |
+      flowchart LR
+        interp[解释器] --> mod[模块/包]
+        mod --> sess[DailySession]
+        sess --> tags[tags 不共享]
+        tags --> gate[G1 CapabilityGate]
+
+  - id: kernel
+    title: 内核
+    layer: 2
+    weeks: [5, 6, 7, 8]
+    gate: G2
+    gist: 标准库落地：pathlib、argparse、sqlite3、原子写。CLI 能摸到 DailySession。
+    explain: |
+      基础对象要落盘、进命令、进事务。不引 SQLAlchemy，先把 sqlite3 连接当资源。
+      开源讲解看标准库 HOWTO：pathlib 是路径对象，argparse 是标准 CLI，sqlite3 事务在 with 里。
+    sources:
+      - { title: "pathlib — pathlib", url: "https://docs.python.org/3/library/pathlib.html" }
+      - { title: "argparse tutorial", url: "https://docs.python.org/3/howto/argparse.html" }
+      - { title: "sqlite3 — connections as context", url: "https://docs.python.org/3/library/sqlite3.html" }
+    diagram: |
+      flowchart TB
+        cli[pyforge session] --> json[JSON 落盘]
+        cli --> sqlite[SqliteSessionRepository]
+        sqlite --> export[export_sessions 原子写]
+        export --> G2[G2 CLI+sqlite+export]
+
+  - id: types
+    title: 类型
+    layer: 3
+    weeks: [9, 10, 11, 12]
+    gate: G3
+    gist: Protocol、Generic/UoW、mypy、Pydantic。契约先于框架。
+    explain: |
+      仓储用 Protocol 而不是继承树。Generic 写出 Repository[T]。mypy 过 domain+services，禁止 type: ignore。
+      Pydantic 吃课表 YAML，脏数据进不来。开源真源是 typing 文档和 Pydantic v2。
+    sources:
+      - { title: "typing — Protocol", url: "https://docs.python.org/3/library/typing.html#typing.Protocol" }
+      - { title: "mypy — getting started", url: "https://mypy.readthedocs.io/en/stable/getting_started.html" }
+      - { title: "Pydantic v2 — models", url: "https://docs.pydantic.dev/latest/concepts/models/" }
+    diagram: |
+      flowchart LR
+        proto[SessionRepository Protocol] --> jsonr[JSON 实现]
+        proto --> sqlr[sqlite 实现]
+        uow[UnitOfWork] --> repo[Repository T]
+        manifest[CourseManifest] --> yaml[curriculum.yaml]
+
+  - id: runtime
+    title: 底层
+    layer: 4
+    weeks: [13, 14, 15, 16]
+    gate: G4
+    gist: GIL、子进程超时、asyncio、httpx 取消。看见运行时，不写 C 扩展。
+    explain: |
+      time.sleep 测不了 GIL。CPU 紧循环才能看见锁。GateRunner 用子进程，超时就杀。
+      asyncio 禁止拿 sleep 装并发。httpx 的取消是真取消。开源看 CPython init 里的 GIL 说明和 asyncio 文档。
+    sources:
+      - { title: "CPython — GIL / thread state", url: "https://docs.python.org/3/c-api/init.html#thread-state-and-the-global-interpreter-lock" }
+      - { title: "asyncio — tasks and cancellation", url: "https://docs.python.org/3/library/asyncio-task.html" }
+      - { title: "httpx — async and timeouts", url: "https://www.python-httpx.org/async/" }
+    diagram: |
+      flowchart TB
+        gil[GIL bench] --> runner[GateRunner 子进程]
+        runner --> aio[asyncio 假 HTTP]
+        aio --> httpx[httpx 可取消]
+        httpx --> G4[G4]
+
+  - id: data
+    title: 数据
+    layer: 5
+    weeks: [17, 18, 19, 20]
+    gate: G5
+    gist: schema 幂等、约束回滚、整批 CSV、周报。G5 不过不准 Django。
+    explain: |
+      表用 IF NOT EXISTS。唯一约束冲了要整笔回滚。CSV 导入一个事务。周报是聚合不是图表库。
+      开源看 sqlite 语言和 csv 模块。这是内核最后一道门。
+    sources:
+      - { title: "SQLite — CREATE TABLE", url: "https://www.sqlite.org/lang_createtable.html" }
+      - { title: "csv — module", url: "https://docs.python.org/3/library/csv.html" }
+      - { title: "sqlite3 — transactions", url: "https://docs.python.org/3/library/sqlite3.html#sqlite3-transaction-control" }
+    diagram: |
+      flowchart LR
+        schema[schema_v1.sql] --> attempts[gate_attempts]
+        attempts --> csv[import_learning_events]
+        csv --> report[WeeklyReportService]
+        report --> G5[G5 才能 Django]
+
+  - id: web
+    title: 框架
+    layer: 6
+    weeks: [21, 22, 23, 24]
+    gate: G6
+    gist: Django 对照 Spring。模板 + HTMX，同进程 Ninja。不开独立 SPA。
+    explain: |
+      /health/ 先活。三张表对齐 W17。FBV 看 HX-Request 决定整页还是 tbody。
+      建 session 必须 CSRF。开源真源是 Django 请求/响应和 HTMX 文档，不是 React 教程。
+    sources:
+      - { title: "Django — request / response", url: "https://docs.djangoproject.com/en/5.1/ref/request-response/" }
+      - { title: "Django — CSRF", url: "https://docs.djangoproject.com/en/5.1/ref/csrf/" }
+      - { title: "HTMX — introduction", url: "https://htmx.org/docs/" }
+    diagram: |
+      flowchart TB
+        browser[浏览器] -->|HX-Request| fbv[weeks FBV]
+        fbv -->|整页| html[weeks.html]
+        fbv -->|片段| tbody[weeks_rows]
+        form[ModelForm+CSRF] --> fbv
+        ninja[同进程 Ninja /api] --> browser
+
+  - id: ship
+    title: 工程
+    layer: 7
+    weeks: [25, 26, 27, 28, 29, 30, 31, 32]
+    gate: G8
+    gist: 工厂、覆盖率、对账、本地 CI、可编辑安装、console_scripts、wheel、uv.lock。
+    explain: |
+      能测、能装、能冻住依赖，才叫交付。不上云 CI 计费。wheel 隔离环境只装包也能 pyforge --version。
+      开源看 packaging 用户指南和 setuptools 的 console_scripts 说明。
+    sources:
+      - { title: "packaging — install from wheel", url: "https://packaging.python.org/en/latest/tutorials/installing-packages/" }
+      - { title: "packaging — pyproject.toml", url: "https://packaging.python.org/en/latest/guides/writing-pyproject-toml/" }
+      - { title: "coverage.py — docs", url: "https://coverage.readthedocs.io/en/latest/" }
+    diagram: |
+      flowchart LR
+        factory[pytest-django 工厂] --> cov[cov>=80]
+        cov --> ci[scripts/ci.ps1]
+        ci --> wheel[uv build]
+        wheel --> lock[uv.lock --frozen]
+
+  - id: observe
+    title: 观测
+    layer: 8
+    weeks: [33, 34, 35, 36, 37, 38, 39, 40, 41, 42, 43, 44, 45, 46, 47, 48]
+    gate: G12
+    gist: 插件、日志、doctor、metrics、脱敏、YAML 吃课表、备份、查询预算、bootstrap。
+    explain: |
+      只准两个插件，钩子炸了不能挡住提交。structlog 带 request_id。prod 禁止 DEBUG=True。
+      课表 YAML 是日历真源。bootstrap 绿了才算一个产品闭环。开源看 importlib.metadata 和 structlog。
+    sources:
+      - { title: "importlib.metadata — entry points", url: "https://docs.python.org/3/library/importlib.metadata.html#entry-points" }
+      - { title: "structlog — getting started", url: "https://www.structlog.org/en/stable/getting-started.html" }
+      - { title: "PyYAML — documentation", url: "https://pyyaml.org/wiki/PyYAMLDocumentation" }
+    diagram: |
+      flowchart TB
+        hook[PluginHook] --> iso[隔离失败]
+        iso --> log[request_id]
+        log --> doctor[pyforge_doctor]
+        yaml[curriculum.yaml] --> importc[import_course]
+        importc --> boot[bootstrap.ps1]
+        boot --> G12[G12]
+
+progression: |
+  flowchart TB
+    A[1 基础 G1] --> B[2 内核 G2]
+    B --> C[3 类型 G3]
+    C --> D[4 底层 G4]
+    D --> E[5 数据 G5]
+    E --> F[6 框架 G6]
+    F --> G[7 工程 G8]
+    G --> H[8 观测 G12]

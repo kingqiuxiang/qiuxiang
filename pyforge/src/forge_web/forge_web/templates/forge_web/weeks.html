@@ -1,0 +1,39 @@
+{% extends "forge_web/base.html" %}
+{% block title %}PyForge weeks{% endblock %}
+{% block body %}
+  <section class="panel">
+    <h2>筛一条 tag</h2>
+    <form id="filter-form" method="get" action="/weeks/" hx-get="/weeks/" hx-target="#rows" hx-swap="innerHTML" hx-trigger="submit, keyup changed delay:400ms from:input">
+      <p><label>filter tag <input id="filter-tag" name="tag" value="{{ tag }}" placeholder="gil"></label>
+      <button type="submit">filter</button>
+      <a class="btn ghost" href="/weeks/" hx-get="/weeks/" hx-target="#rows">clear</a></p>
+    </form>
+  </section>
+  <section class="panel">
+    <h2>新开 DailySession</h2>
+    <form id="create-form" method="post" action="/sessions/new/" hx-post="/sessions/new/" hx-target="#rows" hx-swap="innerHTML" hx-include="#filter-tag" hx-on::after-request="if(event.detail.successful) this.reset()">
+      {% csrf_token %}
+      <div class="stack">
+        <p><label>slice_id {{ form.slice_id }}</label></p>
+        <p><label>tags {{ form.tags_text }}</label></p>
+        <p><button type="submit">create</button></p>
+      </div>
+      <p id="form-status">{% if form_status %}{{ form_status }}{% endif %}</p>
+    </form>
+  </section>
+  <section class="panel busy">
+    <h2>今晚的台账</h2>
+    <table class="ledger">
+      <thead>
+        <tr>
+          <th>slice</th>
+          <th>status</th>
+          <th>tags</th>
+          <th>clock</th>
+          <th>do</th>
+        </tr>
+      </thead>
+      <tbody id="rows">{% include "forge_web/weeks_rows.html" %}</tbody>
+    </table>
+  </section>
+{% endblock %}

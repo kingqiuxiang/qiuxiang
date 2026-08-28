@@ -32,7 +32,7 @@ W1 还没有这些目录时，验收就是 HANDOFF 里那一条 pytest。
 
 ## Cursor Cloud
 
-VM 是 Ubuntu。开场整段贴 `AGENTS.md` 的「Cloud 开场」。不要从 `mobile` 仓起 Cloud。课文 PowerShell 当 bash 跑。
+VM 是 Ubuntu。开场整段贴 `AGENTS.md` 的「Cloud 开场」（不要写死切片号，切片只看 `HANDOFF.md`）。不要从 `mobile` 仓起 Cloud。课文 PowerShell 当 bash 跑。
 
 ## 和其它文档打架时
 

@@ -1,0 +1,31 @@
+{% extends "forge_web/base.html" %}
+{% block title %}PyForge 编排{% endblock %}
+{% block body %}
+  <section class="panel">
+    <h2>由浅入深 · 八层一门</h2>
+    <p class="lede">课表不是清单。过了本层门禁才配进下一层。点一周读课文、开源讲解和架构图。</p>
+    <pre class="mermaid">{{ progression|safe }}</pre>
+  </section>
+  {% for module in modules %}
+  <section class="panel layer">
+    <div class="layer-head">
+      <p class="layer-kicker">L{{ module.spec.layer }} · {{ module.spec.gate }}</p>
+      <h2><a href="/path/{{ module.spec.id }}/">{{ module.spec.title }}</a></h2>
+      <p>{{ module.spec.gist }}</p>
+      <p class="muted">摸过 {{ module.touched }}/{{ module.weeks|length }} 周</p>
+    </div>
+    <div class="week-strip">
+      {% for week in module.weeks %}
+      <a class="week-chip {% if week.touched %}done{% endif %}" href="/lessons/{{ week.code }}/" title="{{ week.title }}">
+        <b>{{ week.code }}</b>
+        <span>{{ week.ship }}</span>
+      </a>
+      {% endfor %}
+    </div>
+  </section>
+  {% endfor %}
+{% endblock %}
+{% block extra_js %}
+<script src="https://cdn.jsdelivr.net/npm/mermaid@11/dist/mermaid.min.js"></script>
+<script>mermaid.initialize({ startOnLoad: true, theme: "dark" });</script>
+{% endblock %}

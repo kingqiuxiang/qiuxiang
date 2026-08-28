@@ -1,13 +1,27 @@
 [project]
 name = "pyforge"
 version = "0.1.0"
-description = "Add your description here"
+description = "Learn Python by forging a small learning OS"
 readme = "README.md"
 authors = [
     { name = "wangqiuxiang" }
 ]
 requires-python = ">=3.12"
-dependencies = []
+dependencies = [
+    "django>=5.1,<6",
+    "django-ninja>=1.6.3",
+    "httpx>=0.28",
+    "pydantic>=2.10",
+    "pyyaml>=6.0",
+    "structlog>=25.0",
+]
+
+[project.scripts]
+pyforge = "pyforge.cli:main"
+
+[project.entry-points."pyforge.plugins"]
+pomodoro = "pyforge.plugins.pomodoro:load"
+wrongbook = "pyforge.plugins.wrongbook:load"
 
 [build-system]
 requires = ["uv_build>=0.12.5,<0.13.0"]
@@ -15,5 +29,14 @@ build-backend = "uv_build"
 
 [dependency-groups]
 dev = [
+    "mypy>=1.15",
     "pytest>=9.1.1",
+    "pytest-cov>=6.0",
+    "pytest-django>=4.9",
+    "types-pyyaml>=6.0.12.20260815",
 ]
+
+[tool.pytest.ini_options]
+pythonpath = ["src", "src/forge_web"]
+DJANGO_SETTINGS_MODULE = "forge_web.settings"
+testpaths = ["tests", "src/forge_web/forge_web/tests"]

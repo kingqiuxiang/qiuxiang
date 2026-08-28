@@ -1,0 +1,5 @@
+{
+  "name": "qiuxiang-pyforge",
+  "install": "bash .cursor/install-pyforge.sh",
+  "start": "bash .cursor/start-pyforge.sh"
+}

@@ -6,24 +6,23 @@
 
 ```yaml
 schema: pyforge-handoff-v1
-updated_at: 2026-08-28T17:20:00+08:00
-slice_id: W01-02
+updated_at: 2026-08-28T21:30:00+08:00
+slice_id: DONE
 phase: daily
 freeze_features: false
 unmerged_slices: 0
 inbox_pending: 0
 allowed_paths:
-  - tests/test_env.py
   - HANDOFF.md
   - packs/_inbox.md
   - knowledge/cards/**
-last_completed: "W01-01 过。仓已整理可上 Cloud（AGENTS.md + .cursor/environment.json）。代码下一刀仍是 W01-02"
-next_command: "读 courses/lessons/W01-02-uv不是JAVA_HOME.md；新建 tests/test_env.py；uv run pytest tests/test_version.py tests/test_env.py -q；uv run python -c \"import sys; print('uv ', sys.prefix)\"；再跑 python3 -c \"import sys; print('sys', sys.prefix)\"（没有 python3/python 也算看懂，别装全局包）"
+last_completed: "W23-03 编排绿：八层 /path/、课文 /lessons/Wxx/、官方讲解+mermaid。ci 81。"
+next_command: "cd pyforge && export PATH=\"$HOME/.local/bin:$PATH\" && uv sync --frozen && pwsh -File scripts/verify_all.ps1"
 blocked: ""
 do_not_touch:
   - 任何 mobile Java
   - 前端独立 SPA / Reflex 主栈
-  - W1–20 的 django / frontend / Celery / Airflow
+  - 新开第二产品
 ```
 
 ## 已锁
@@ -33,21 +32,18 @@ do_not_touch:
 - **递进**：`DailySession` 主线不换名；允许新增值对象（Slice / Gate），不另开故事。
 - 学习顺序：W1–20 = `src/pyforge` 内核（CLI + sqlite）。**G5 不过不准建 Django。**
 - W21 起目标栈：Django 5 + 模板 + HTMX + 同进程 Ninja；编排先进程内 scheduler，Celery 不早于 G6
-- 目标拆仓：11 个 app + `plugin_api` + `integrations/`（W21 才建 Django app）
-- 行数：第一年核心协议 3–8 万；18 个月诚实 **25–35 万** qual LOC；100 万约 30–42 个月
-- 日历真源：`courses/curriculum.yaml`（不是任何「W4 上 Django」的手册月历）
 - 不做：FastAPI+React、双 ORM、vendor 第三方、未加载空壳、核心 `import integrations.*`、用 Python 自研 linter
 
 贯穿对象：`DailySession` `KnowledgeSlice` `CapabilityGate` `CourseManifest` `PluginHook` `ObservationEvent`
 
 ## 当前切片
 
-W01-02 uv 不是 JAVA_HOME（只加 `tests/test_env.py`，不改版本号）
+48 周闭环。之后只修红 / 还债，不加第二条产品线。
 
 ## 下一验收命令
 
 ```text
-uv run pytest tests/test_version.py tests/test_env.py -q
+pwsh -File scripts/verify_all.ps1
 ```
 
 ## 完成定义
@@ -56,27 +52,12 @@ uv run pytest tests/test_version.py tests/test_env.py -q
 2. `next_command` 已改成下一条**可执行**命令（禁止「继续完善」）
 3. 一张四件套卡，或 `packs/_inbox.md` 草稿且 `inbox_pending` +1
 
-## 禁止事项
-
-改 mobile Java；提问；W1–20 出现 django/frontend/Celery；G1 没绿就建 `cli/`；allowed_paths 外改业务；测试红还加功能；上下文 80% 继续 Implement。
-
 ## 三行状态
 
-- 做成了：W01-01 包能 import，终端印出 0.1.0；仓已可挂 Cloud
-- 红/绿：`uv run pytest tests/test_version.py -q` 1 passed
-- 下一刀：W01-02，对比系统 python3 和 uv run 的 sys.prefix
+- 做成了：48 周闭环 + 锻造台 + 八层编排（课文/图/开源链接）
+- 红/绿：ci 81
+- 下一刀：只修红。不要新开第二产品
 
-## 云上（Cursor Cloud / qiuxiang）
+## 云上
 
-- 本仓独立。禁止从公司 `mobile` / `qiangungun` 起 Cloud。
-- VM 是 Ubuntu。读 `AGENTS.md` 的 Cloud 节，开场 prompt 整段贴那里。
-- 未 push 的提交 Cloud 看不见。
-
-## 开场续跑
-
-```text
-继续 PyForge。不要提问，不要改任何 Java / mobile。
-真源：HANDOFF.md + courses/lessons/ 当前篇。先读 AGENTS.md。
-先读课文再写代码。W1–20 不准 django / frontend。
-只做本课「今晚只改这一刀」，跑验收，回写 next_command，停。
-```
+当前分支 `cursor/w01-02-uv-env-f4a6` 当主线。未 push 的改动 Cloud 看不见。

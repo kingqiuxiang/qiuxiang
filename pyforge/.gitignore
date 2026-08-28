@@ -9,6 +9,10 @@ wheels/
 # Local env / caches
 .venv
 .pytest_cache/
+.coverage
+htmlcov/
+src/forge_web/db.sqlite3
+src/forge_web/forge_web/__pycache__/
 
 # Editor / agent scratch
 .cursor/tmp/

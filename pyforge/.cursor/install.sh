@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# Cursor Cloud Build。必须幂等。不要激活 venv。
+# 当仓根就是 pyforge 时用。必须幂等。不要激活 venv。不要在 install 里跑测试。
 set -euo pipefail
 
 export PATH="${HOME}/.local/bin:${PATH}"
@@ -15,5 +15,3 @@ fi
 
 uv python install 3.12
 uv sync --frozen
-uv run pytest tests/test_version.py -q
-uv run python -c "import pyforge; print(pyforge.__version__)"
