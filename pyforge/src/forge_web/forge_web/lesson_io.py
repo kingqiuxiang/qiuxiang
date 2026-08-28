@@ -56,7 +56,7 @@ def _render_body(body: str) -> str:
         lang = match.group(1) or ""
         code = match.group(2).rstrip("\n")
         if lang == "mermaid":
-            parts.append(f'<pre class="mermaid">{html.escape(code)}</pre>')
+            parts.append(f'<pre class="mermaid">{code}</pre>')
         else:
             parts.append(f'<pre><code class="lang-{html.escape(lang)}">{html.escape(code)}</code></pre>')
         cursor = match.end()

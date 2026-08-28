@@ -21,7 +21,7 @@
   {% if module.diagram %}
   <section class="panel">
     <h2>本层流程图</h2>
-    <pre class="mermaid">{{ module.diagram }}</pre>
+    <pre class="mermaid">{{ module.diagram|safe }}</pre>
   </section>
   {% endif %}
   <section class="panel">

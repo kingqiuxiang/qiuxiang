@@ -4,7 +4,7 @@
   <section class="panel">
     <h2>由浅入深 · 八层一门</h2>
     <p class="lede">课表不是清单。过了本层门禁才配进下一层。点一周读课文、开源讲解和架构图。</p>
-    <pre class="mermaid">{{ progression }}</pre>
+    <pre class="mermaid">{{ progression|safe }}</pre>
   </section>
   {% for module in modules %}
   <section class="panel layer">
