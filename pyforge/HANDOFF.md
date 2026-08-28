@@ -6,19 +6,20 @@
 
 ```yaml
 schema: pyforge-handoff-v1
-updated_at: 2026-08-28T17:20:00+08:00
-slice_id: W01-02
+updated_at: 2026-08-28T18:15:00+08:00
+slice_id: W02-01
 phase: daily
 freeze_features: false
-unmerged_slices: 0
+unmerged_slices: 1
 inbox_pending: 0
 allowed_paths:
-  - tests/test_env.py
+  - src/pyforge/session.py
+  - tests/test_session.py
   - HANDOFF.md
   - packs/_inbox.md
   - knowledge/cards/**
-last_completed: "W01-01 过。仓已整理可上 Cloud（AGENTS.md + .cursor/environment.json）。代码下一刀仍是 W01-02"
-next_command: "读 courses/lessons/W01-02-uv不是JAVA_HOME.md；新建 tests/test_env.py；uv run pytest tests/test_version.py tests/test_env.py -q；uv run python -c \"import sys; print('uv ', sys.prefix)\"；再跑 python3 -c \"import sys; print('sys', sys.prefix)\"（没有 python3/python 也算看懂，别装全局包）"
+last_completed: "W01-02 过。tests/test_env.py 断言跑在 .venv；Cloud 上 uv prefix=/workspace/pyforge/.venv，系统 python3 prefix=/usr"
+next_command: "读 courses/lessons/W02-01-DailySession与可变默认参数.md；新建 src/pyforge/session.py 与 tests/test_session.py；uv run pytest tests/test_session.py -q；uv run python -c \"from pyforge.session import DailySession; a=DailySession('W02').start(); b=DailySession('W02').start(); a.tags.append('gil'); print(a.tags, b.tags)\""
 blocked: ""
 do_not_touch:
   - 任何 mobile Java
@@ -42,12 +43,12 @@ do_not_touch:
 
 ## 当前切片
 
-W01-02 uv 不是 JAVA_HOME（只加 `tests/test_env.py`，不改版本号）
+W02-01 DailySession 与可变默认参数（新建 `src/pyforge/session.py` + `tests/test_session.py`，tags 用 `default_factory`）
 
 ## 下一验收命令
 
 ```text
-uv run pytest tests/test_version.py tests/test_env.py -q
+uv run pytest tests/test_session.py -q
 ```
 
 ## 完成定义
@@ -62,15 +63,16 @@ uv run pytest tests/test_version.py tests/test_env.py -q
 
 ## 三行状态
 
-- 做成了：W01-01 包能 import，终端印出 0.1.0；仓已可挂 Cloud
-- 红/绿：`uv run pytest tests/test_version.py -q` 1 passed
-- 下一刀：W01-02，对比系统 python3 和 uv run 的 sys.prefix
+- 做成了：W01-02 钉死项目 `.venv`；uv prefix 与系统 python3 prefix 不同；系统 `python3 -m pytest` 是 `No module named pytest`
+- 红/绿：`uv run pytest tests/test_version.py tests/test_env.py -q` 2 passed
+- 下一刀：W02-01，写下第一个领域对象 DailySession
 
 ## 云上（Cursor Cloud / qiuxiang）
 
 - 本仓独立。禁止从公司 `mobile` / `qiangungun` 起 Cloud。
 - VM 是 Ubuntu。读 `AGENTS.md` 的 Cloud 节，开场 prompt 整段贴那里。
 - 未 push 的提交 Cloud 看不见。
+- W01-02 实测：`uv run python` → `/workspace/pyforge/.venv`；`python3` → `/usr`
 
 ## 开场续跑
 
