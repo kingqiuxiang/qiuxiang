@@ -1,0 +1,66 @@
+# PyForge 48 周课表真源。W41 用 import_course 吃这份文件。
+# 过不了对应 gate 不准进下一阶段目录。
+version: 1
+track: pyforge-python-os
+gates:
+  G1: { week: 4, cmd: "pytest tests/test_session.py tests/test_copying.py tests/test_slices.py tests/test_gate.py -q" }
+  G2: { week: 8, cmd: "pytest tests/test_cli.py tests/test_sqlite_repo.py tests/test_export.py -q" }
+  G3: { week: 12, cmd: "mypy src/pyforge/domain src/pyforge/services && pytest tests/test_course_manifest.py tests/test_repo_protocol.py -q" }
+  G4: { week: 16, cmd: "pytest tests/test_gil_bench.py tests/test_gate_runner.py tests/test_catalog_fetch.py -q" }
+  G5: { week: 20, cmd: "pytest tests/test_import_events.py tests/test_weekly_report.py tests/test_gate_attempts.py -q" }
+  G6: { week: 24, cmd: "python src/forge_web/manage.py test forge_web.tests.test_session_form forge_web.tests.test_week_list" }
+  G7: { week: 28, cmd: "powershell -File scripts/ci.ps1" }
+  G8: { week: 32, cmd: "pyforge --version" }
+  G9: { week: 36, cmd: "pytest tests/test_plugin_isolation.py tests/test_plugin_discover.py -q" }
+  G10: { week: 40, cmd: "pytest tests/test_log_context.py tests/test_error_redact.py forge_web/tests/test_metrics.py -q" }
+  G11: { week: 44, cmd: "python src/forge_web/manage.py test forge_web.tests.test_backup_restore" }
+  G12: { week: 48, cmd: "powershell -File scripts/bootstrap.ps1" }
+weeks:
+  - { n: 1, slice: "解释器、模块、包、uv、pytest", ship: "src 布局 + __version__", verify: "pytest tests/test_version.py -q", skip: "Django/asyncio/frontend" }
+  - { n: 2, slice: "函数、LEGB、None、is/==、可变默认参数", ship: "DailySession start/stop", verify: "pytest tests/test_session.py -q", skip: "CLI/装饰器玄学" }
+  - { n: 3, slice: "容器、切片浅拷贝、解包", ship: "SliceRegistry", verify: "pytest tests/test_slices.py -q", skip: "pandas/ORM" }
+  - { n: 4, slice: "dataclass、异常链、eq/hash", ship: "CapabilityGate", verify: "pytest tests/test_gate.py -q", skip: "元类/MRO" }
+  - { n: 5, slice: "pathlib/json/datetime/logging", ship: "JSON 落盘", verify: "pytest tests/test_session_store.py -q", skip: "pickle/YAML" }
+  - { n: 6, slice: "argparse", ship: "CLI session start|end|list", verify: "pytest tests/test_cli.py -q", skip: "click/typer" }
+  - { n: 7, slice: "sqlite3 事务", ship: "SqliteSessionRepository", verify: "pytest tests/test_sqlite_repo.py -q", skip: "SQLAlchemy/Postgres" }
+  - { n: 8, slice: "生成器与原子写", ship: "export_sessions", verify: "pytest tests/test_export.py -q", skip: "asyncio" }
+  - { n: 9, slice: "Protocol", ship: "双仓储实现", verify: "pytest tests/test_repo_protocol.py -q", skip: "Django stubs" }
+  - { n: 10, slice: "Generic/UoW", ship: "Repository[T]", verify: "pytest tests/test_generic_repo.py -q", skip: "Pydantic（下下周）" }
+  - { n: 11, slice: "mypy", ship: "domain+services 过类型", verify: "mypy src/pyforge/domain src/pyforge/services", skip: "type: ignore" }
+  - { n: 12, slice: "Pydantic v2", ship: "CourseManifest 拒脏数据", verify: "pytest tests/test_course_manifest.py -q", skip: "Ninja/DRF" }
+  - { n: 13, slice: "GIL", ship: "bench gil", verify: "pytest tests/test_gil_bench.py -q", skip: "C 扩展" }
+  - { n: 14, slice: "futures/超时", ship: "GateRunner 子进程", verify: "pytest tests/test_gate_runner.py -q", skip: "Celery" }
+  - { n: 15, slice: "asyncio", ship: "假 HTTP 拉索引", verify: "pytest tests/test_async_index.py -q", skip: "time.sleep" }
+  - { n: 16, slice: "httpx 取消", ship: "catalog fetch", verify: "pytest tests/test_catalog_fetch.py -q", skip: "真爬虫" }
+  - { n: 17, slice: "schema 幂等", ship: "schema_v1.sql", verify: "pytest tests/test_schema.py -q", skip: "Django" }
+  - { n: 18, slice: "约束与回滚", ship: "gate_attempts", verify: "pytest tests/test_gate_attempts.py -q", skip: "Redis" }
+  - { n: 19, slice: "csv 整批事务", ship: "import_learning_events", verify: "pytest tests/test_import_events.py -q", skip: "pandas" }
+  - { n: 20, slice: "周报聚合", ship: "WeeklyReportService", verify: "pytest tests/test_weekly_report.py -q", skip: "图表库" }
+  - { n: 21, slice: "Django 对照 Spring", ship: "/health/ ok", verify: "python src/forge_web/manage.py check", skip: "独立 frontend" }
+  - { n: 22, slice: "ORM 对齐 W17 字段", ship: "三张表+迁移", verify: "python src/forge_web/manage.py test forge_web.tests.test_models", skip: "自定义 Manager 炫技" }
+  - { n: 23, slice: "FBV+HTMX", ship: "/weeks/ partial", verify: "python src/forge_web/manage.py test forge_web.tests.test_week_list", skip: "JSON API 喂 SPA" }
+  - { n: 24, slice: "ModelForm+CSRF", ship: "HTMX 建 session", verify: "python src/forge_web/manage.py test forge_web.tests.test_session_form", skip: "OAuth" }
+  - { n: 25, slice: "pytest-django 工厂", ship: "factories.py", verify: "pytest forge_web/tests/test_factories.py -q", skip: "Playwright" }
+  - { n: 26, slice: "覆盖率门槛", ship: "表驱动门禁", verify: "pytest --cov=src/pyforge --cov-fail-under=80 -q", skip: "压测" }
+  - { n: 27, slice: "CLI/Web 对账", ship: "parity 测试", verify: "pytest tests/test_parity_cli_web.py -q", skip: "OpenAPI 生成" }
+  - { n: 28, slice: "本地 CI", ship: "scripts/ci.ps1", verify: "powershell -File scripts/ci.ps1", skip: "云 CI 计费" }
+  - { n: 29, slice: "可编辑安装", ship: "pip install -e .", verify: "python -c \"import pyforge; assert pyforge.__version__\"", skip: "conda" }
+  - { n: 30, slice: "console_scripts", ship: "pyforge 命令", verify: "pyforge --help", skip: "Docker 当打包" }
+  - { n: 31, slice: "wheel", ship: "只装 wheel 能跑", verify: "pyforge --version", skip: "私服" }
+  - { n: 32, slice: "uv.lock", ship: "--frozen", verify: "uv sync --frozen && pytest -q", skip: "Poetry 互迁" }
+  - { n: 33, slice: "插件 Protocol", ship: "PluginRegistry", verify: "pytest tests/test_plugin_registry.py -q", skip: "插件微服务" }
+  - { n: 34, slice: "entry points", ship: "pyforge.plugins", verify: "pytest tests/test_plugin_discover.py -q", skip: "pkg_resources" }
+  - { n: 35, slice: "钩子隔离", ship: "插件炸不影响提交", verify: "pytest tests/test_plugin_isolation.py -q", skip: "热更新" }
+  - { n: 36, slice: "番茄+错题", ship: "可 disable", verify: "python src/forge_web/manage.py pyforge_plugins", skip: "第三个插件" }
+  - { n: 37, slice: "structlog", ship: "request_id", verify: "pytest tests/test_log_context.py -q", skip: "ELK" }
+  - { n: 38, slice: "doctor", ship: "pyforge_doctor", verify: "python src/forge_web/manage.py pyforge_doctor", skip: "K8s probe" }
+  - { n: 39, slice: "metrics", ship: "/metrics/", verify: "python src/forge_web/manage.py test forge_web.tests.test_metrics", skip: "Grafana" }
+  - { n: 40, slice: "脱敏", ship: "ErrorEvent 无密码", verify: "pytest tests/test_error_redact.py -q", skip: "SaaS APM 当作业" }
+  - { n: 41, slice: "YAML DSL", ship: "吃本文件", verify: "python src/forge_web/manage.py import_course courses/curriculum.yaml", skip: "自造语言" }
+  - { n: 42, slice: "门禁引擎", ship: "GateRunner 写库", verify: "pytest tests/test_gate_engine.py -q", skip: "分布式 cron" }
+  - { n: 43, slice: "HTMX 筛选", ship: "只刷新 tbody", verify: "python src/forge_web/manage.py test forge_web.tests.test_week_filter", skip: "WebSocket" }
+  - { n: 44, slice: "备份恢复", ship: "restore 回点", verify: "python src/forge_web/manage.py pyforge_backup", skip: "云盘 PKI" }
+  - { n: 45, slice: "查询预算", ship: "≤8 queries", verify: "python src/forge_web/manage.py test forge_web.tests.test_query_budget", skip: "微服务" }
+  - { n: 46, slice: "prod doctor", ship: "DEBUG=True 失败", verify: "python src/forge_web/manage.py pyforge_doctor --env prod", skip: "渗透/exploit" }
+  - { n: 47, slice: "MkDocs+seed", ship: "seed_demo", verify: "python src/forge_web/manage.py seed_demo", skip: "独立文档仓" }
+  - { n: 48, slice: "bootstrap", ship: "空目录全绿", verify: "powershell -File scripts/bootstrap.ps1", skip: "新开第二产品" }

@@ -1,0 +1,19 @@
+# Python
+__pycache__/
+*.py[oc]
+*.egg-info
+build/
+dist/
+wheels/
+
+# Local env / caches
+.venv
+.pytest_cache/
+
+# Editor / agent scratch
+.cursor/tmp/
+*.swp
+
+# OS
+.DS_Store
+Thumbs.db
